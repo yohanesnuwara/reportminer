@@ -10,7 +10,7 @@ if not shutil.which("pdftotext"):  # `pdftotext` is a Poppler utility
         "  On macOS: brew install poppler\n"
     )
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("reportminer/README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
