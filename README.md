@@ -22,5 +22,15 @@ If you have access to Colab Pro's GPU A100 and high memory, you can make advanta
 
 ### 3. Perform query
 
+## Future development
+
+In the next version, the following will be implemented:
+
+✅ Support for multiple PDF reports in a directory structure (best industrial case)
+
+✅ Support for fine tuning with user reports of specific domain
+
+✅ Integration with vector databases for robust document indexing 
+
 
 
