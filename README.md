@@ -10,5 +10,13 @@ Then, install the package
 
 `pip install reportminer`
 
+## Use RAG in 3 simple steps
+
+### 1. Setup embedding model and visual language model
+
+### 2. Upload your report
+
+### 3. Perform query
+
 
 
