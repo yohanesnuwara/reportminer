@@ -7,18 +7,18 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
 
-def PDF_folder(pdf_folder, dpi=200):
+def PDF_folder(pdf_folder, models, dpi=200):
     """
     Converts PDF files into images and stores them in sub-folders named after the PDF files.
 
     Args:
         pdf_folder (str): The path to the folder that contains PDF files.
-        output_base_folder (str): The path to the base folder where images will be stored.
+        models (list): List that consists embedding model, VL model, and VL processor.
         dpi (int): The resolution of the images in DPI. Default is 200.
-
-    Returns:
-        None
     """
+    # Retrieve docs retrieval model as the first element of model input
+    docs_retrieval_model = models[0]
+
     # Get the list of PDF files in the folder
     pdf_files = [f for f in os.listdir(pdf_folder) if f.endswith('.pdf')]
 
@@ -53,12 +53,9 @@ def process_PDF(pdf_file, models, dpi=200, index_name='rag'):
 
     Args:
         pdf_file (str): The path to the PDF file.
-        output_base_folder (str, optional): The base folder where images will be saved.
-                                            If None, images are saved in the current working directory.
+        models (list): List that consists embedding model, VL model, and VL processor.
         dpi (int): The resolution of the images in DPI. Default is 200.
 
-    Returns:
-        list: A list of images, where each image corresponds to a page in the PDF.
     """
     # Retrieve docs retrieval model as the first element of model input
     docs_retrieval_model = models[0]
@@ -97,12 +94,28 @@ def process_PDF(pdf_file, models, dpi=200, index_name='rag'):
     return models
 
 def retrieve_image(page_num):
+    """
+    Retrieve page image based on page number.
+
+    Args:
+        page_num (int): Page number.
+
+    """  
     output_base_folder = os.getcwd() + '/saved_images'
     image_path = os.path.join(output_base_folder, f"page_{page_num}.jpg")
     image = Image.open(image_path)
     return image
 
 def RAG(text_query, models, k=1):
+    """
+    Retrieve k relevant pages using embedding model.
+
+    Args:
+        text_query (str): Query for the document. Can be in a form of question.
+        models (list): List that consists embedding model, VL model, and VL processor.
+        k (int): The number of relevant pages to retrieve. Default is 1.
+
+    """  
     # Retrieve docs retrieval model as the first element of model input
     docs_retrieval_model = models[0]
 
@@ -124,6 +137,16 @@ def RAG(text_query, models, k=1):
         print('\n')
 
 def Ask(text_query, models):
+    """
+    Perform question and answering task to document.
+
+    Args:
+        text_query (str): Query for the document. Can be in a form of question.
+        models (list): List that consists embedding model, VL model, and VL processor.
+    
+    Return:
+        Answer given from the VL model
+    """   
     # Embedding model
     docs_retrieval_model = models[0]
 
@@ -167,14 +190,14 @@ def Ask(text_query, models):
     output_text = processor.batch_decode(
         generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
     )
-    print(output_text)
+    return output_text[0]
 
 def setup_model(embedding='vidore/colpali-v1.2', vlm='HuggingFaceTB/SmolVLM-Instruct'):
     """
     Install embedding model and visual language model
 
     Args:
-        embedding (str): Model name of the embedding model from HuggingFace. Default is 'vidore/colpali-v1.2'.
+        embedding (str): Model name of the embedding model from HuggingFace or Byaldi. Default is 'vidore/colpali-v1.2'.
         vlm (str): Model name of the visual language model from HuggingFace. Default is 'HuggingFaceTB/SmolVLM-Instruct'.
     """
     # Print selected model
