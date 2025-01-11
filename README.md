@@ -43,7 +43,8 @@ rag_models = rag.process_PDF(pdf_file, rag_models, dpi=200, index_name='pvt-rag'
 There are 2 minimal tasks you can use with ReportMiner. First, you can retrieve relevant page taking advantage of the embedding model
 
 ```
-rag.Ask('How many cored intervals are there in the report? Mention the depth of each', rag_models)
+rag.RAG('How is the Klinkenberg corrected gas horizontal permeability to porosity looks like at core 7?', 
+        rag_models, k=1)
 ```
 
 Second, you can ask a question, taking advantage of the visual language model
