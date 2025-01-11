@@ -15,7 +15,7 @@ with open("reportminer/README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='ReportMiner',
-    version='0.1.0',    
+    version='0.1.1',    
     description='Easy to use wrapper for text document question and answer using RAG and LLM',
     long_description=long_description,  
     long_description_content_type="text/markdown",  
