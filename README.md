@@ -2,7 +2,7 @@
 
 ReportMiner is an easy-to-use wrapper for multimodal retrieval augmented generation (RAG) tasks for technical reports. With ReportMiner, you can use any HuggingFace or Byaldi and apply for your reports. 
 
-## Installation
+## 🤖 Installation
 Make sure to install Poppler first
 
 `sudo apt-get install -y poppler-utils` on Linux OS
@@ -11,7 +11,7 @@ Then, install the package
 
 `pip install reportminer`
 
-## Use RAG in 3 simple steps
+## 🚀 Use RAG in 3 simple steps
 
 Using ReportMiner is just few lines of codes. 
 
@@ -52,7 +52,7 @@ Second, you can ask a question, taking advantage of the visual language model
 rag.Ask('How many cored intervals are there in the report? Mention the depth of each', rag_models)
 ```
 
-## Future development
+## 👨‍💻 Future development
 
 In the next version, the following will be implemented:
 
