@@ -21,6 +21,7 @@ setup(
     install_requires=[
         'byaldi>=0.0.7',
         'transformers>=4.46.3',
+        'pdf2image>=1.17.0',
         'pillow>=11.1.0',
         'numpy>=1.26.4',
         'matplotlib>=3.10.0'
