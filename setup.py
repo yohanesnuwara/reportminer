@@ -10,10 +10,15 @@ if not shutil.which("pdftotext"):  # `pdftotext` is a Poppler utility
         "  On macOS: brew install poppler\n"
     )
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
     name='ReportMiner',
     version='0.1.0',    
     description='Easy to use wrapper for text document question and answer using RAG and LLM',
+    long_description=long_description,  
+    long_description_content_type="text/markdown",  
     url='https://github.com/yohanesnuwara/reportminer',
     author='Yohanes Nuwara',
     author_email='ign.nuwara97@gmail.com',
