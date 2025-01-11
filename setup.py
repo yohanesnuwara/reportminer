@@ -1,5 +1,14 @@
 from setuptools import setup
 
+# Check if `poppler` is installed
+if not shutil.which("pdftotext"):  # `pdftotext` is a Poppler utility
+    print(
+        "Warning: Poppler is not installed. "
+        "Please install it using your system's package manager:\n"
+        "  On Ubuntu/Debian: sudo apt-get install -y poppler-utils\n"
+        "  On macOS: brew install poppler\n"
+    )
+
 setup(
     name='ReportMiner',
     version='0.1.0',    
