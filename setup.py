@@ -1,4 +1,5 @@
 from setuptools import setup
+import shutil
 
 # Check if `poppler` is installed
 if not shutil.which("pdftotext"):  # `pdftotext` is a Poppler utility
