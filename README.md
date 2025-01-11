@@ -1,4 +1,5 @@
-# ReportMiner
+![image](https://github.com/user-attachments/assets/c9bcf0b6-5335-49ea-9b9a-eba9d51feb40)
+
 ReportMiner is an easy-to-use wrapper for multimodal retrieval augmented generation (RAG) tasks for technical reports. With ReportMiner, you can use any HuggingFace or Byaldi and apply for your reports. 
 
 ## Installation
