@@ -1,5 +1,6 @@
 from setuptools import setup
 import shutil
+import os
 
 # Check if `poppler` is installed
 if not shutil.which("pdftotext"):  # `pdftotext` is a Poppler utility
@@ -10,7 +11,14 @@ if not shutil.which("pdftotext"):  # `pdftotext` is a Poppler utility
         "  On macOS: brew install poppler\n"
     )
 
-with open("reportminer/README.md", "r", encoding="utf-8") as fh:
+# Get the directory of this script
+current_dir = os.path.abspath(os.path.dirname(__file__))
+
+# Path to README.md
+readme_path = os.path.join(current_dir, "README.md")
+
+# Read the README.md content
+with open(readme_path, "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
