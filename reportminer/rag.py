@@ -220,3 +220,35 @@ def setup_model(embedding='vidore/colpali-v1.2', vlm='HuggingFaceTB/SmolVLM-Inst
     vl_processor = AutoProcessor.from_pretrained(vlm)    
 
     return [docs_retrieval_model, vl_model, vl_processor]
+
+
+def load_model_from_pretrained(pretrained_embedding_index_name, vlm='HuggingFaceTB/SmolVLM-Instruct'):
+    """
+    Load pretrained embedding model indexes and setup VLM 
+
+    Pretrained index must be inside ./.byaldi/<index-name>/...
+
+    Args:
+        pretrained_embedding_index_name (str, path like): Index name of pretrained embedding model.
+        vlm (str): Model name of the visual language model from HuggingFace. Default is 'HuggingFaceTB/SmolVLM-Instruct'.
+    """
+    # Print selected model
+    print('Selected embedding model - PRETRAINED:', pretrained_embedding_index_name)
+    print('Selected visual language model:', vlm)
+
+    # Setup embedding model
+    docs_retrieval_model = RAGMultiModalModel.from_index(pretrained_embedding_index_name)
+
+    # Setup visual language model
+    vl_model = Idefics3ForConditionalGeneration.from_pretrained(
+        vlm,
+        device_map="auto",
+        torch_dtype=torch.bfloat16,
+        _attn_implementation="eager",
+    )
+    vl_model.eval()
+
+    # Setup VLM processor
+    vl_processor = AutoProcessor.from_pretrained(vlm)    
+
+    return [docs_retrieval_model, vl_model, vl_processor]
