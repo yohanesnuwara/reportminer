@@ -38,7 +38,8 @@ setup(
         'pdf2image>=1.17.0',
         'pillow>=11.1.0',
         'numpy>=1.26.4',
-        'matplotlib>=3.10.0'
+        'matplotlib>=3.10.0',
+        'pypdf2>=3.0.1'
     ],
     classifiers=[
         'Development Status :: 1 - Planning',
