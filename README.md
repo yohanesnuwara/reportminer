@@ -53,13 +53,16 @@ Second, you can ask a question, taking advantage of the visual language model
 rag.Ask('How many cored intervals are there in the report? Mention the depth of each', rag_models)
 ```
 
+## 👨‍💻 Features
+
+1. Added support for processing multiple technical files any format (PDF, Excel, Word, PowerPoint)
+
 ## 👨‍💻 Future development
 
 In the next version, the following will be implemented:
 
-1. Support for multiple PDF reports in a directory structure (best industrial case)
-2. Support for fine tuning with user reports of specific domain
-3. Integration with vector databases for robust document indexing 
+1. Support for fine tuning with user reports of specific domain
+2. Integration with vector databases for robust document indexing 
 
 
 
