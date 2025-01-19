@@ -1,15 +1,90 @@
 ![image](https://github.com/user-attachments/assets/c9bcf0b6-5335-49ea-9b9a-eba9d51feb40)
 
-ReportMiner is an easy-to-use wrapper for multimodal retrieval augmented generation (RAG) tasks for technical reports. With ReportMiner, you can use any HuggingFace or Byaldi and apply for your reports. 
+ReportMiner is an easy-to-use wrapper for multimodal retrieval augmented generation (RAG) tasks for technical reports. With ReportMiner, you can use any HuggingFace or Byaldi and apply for your reports of any format (PDF, Excel, PPT)
 
 ## 🤖 Installation
-Make sure to install Poppler first
 
-`sudo apt-get install -y poppler-utils` on Linux OS
+Depending on your files, you need to install differently. 
+
+### Basic package
+
+Basic package means working with only PDF file format. Make sure to install Poppler first
+
+```
+!apt-get update
+!apt-get install -y poppler-utils
+```` 
+on Linux OS
 
 Then, install the package
 
-`pip install reportminer`
+```
+pip install reportminer
+```
+
+### Excel package
+
+Excel package means working with XLS and PDF file format, which requires additional packages (Libgdiplus)
+
+```
+!apt-get update
+!apt-get install -y poppler-utils
+!sudo apt install -y libgdiplus
+!sudo ln -s /usr/lib/libgdiplus.so /usr/lib/libgdiplus
+```` 
+on Linux OS
+
+Then, install the package
+
+```
+pip install reportminer[xls]
+```
+
+### Presentation package
+
+Excel package means working with XLS and PPT file format, which requires additional packages to support Microsoft Office fonts
+
+```
+!apt-get update
+!apt-get install -y poppler-utils
+!sudo apt-get install -y ttf-mscorefonts-installer
+!sudo apt-get install fonts-dejavu
+!sudo apt-get install fonts-liberation
+```` 
+on Linux OS
+
+Then, install the package
+
+```
+pip install reportminer[ppt]
+```
+
+### Combined package
+
+Excel package means working with XLS, PPT, and PDF file format, literally need all packages
+
+```
+!apt-get update
+!apt-get install -y poppler-utils
+!sudo apt-get install -y ttf-mscorefonts-installer
+!sudo apt-get install fonts-dejavu
+!sudo apt-get install fonts-liberation
+!sudo apt install -y libgdiplus
+!sudo ln -s /usr/lib/libgdiplus.so /usr/lib/libgdiplus
+```` 
+on Linux OS
+
+Then, install the package
+
+```
+pip install reportminer[xls,ppt]
+```
+
+or
+
+```
+pip install reportminer[all]
+```
 
 ## 🚀 Use RAG in 3 simple steps
 
