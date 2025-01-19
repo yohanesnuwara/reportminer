@@ -109,6 +109,157 @@ def count_pdf_pages_in_subdirectories(root_directory):
 
     return df
 
+import os
+from pdf2image import convert_from_path
+
+def Process(base_folder, models, dpi=100, index_name='rag'):
+    """
+    Processes files in a folder based on their format (.xls, .ppt, .pdf) and applies specific processing.
+    """
+    output_base_folder = os.path.join(os.getcwd(), 'saved_images')
+    os.makedirs(output_base_folder, exist_ok=True)
+
+    ppt_base_folder = os.path.join(os.getcwd(), 'converted_ppt')
+    os.makedirs(ppt_base_folder, exist_ok=True)
+
+    files = os.listdir(base_folder)
+
+    # -------------------------------------------------------
+    # 1. Check for file types
+    # -------------------------------------------------------
+    ppt_files = [f for f in files if f.lower().endswith(('.ppt', '.pptx'))]
+    xls_files = [f for f in files if f.lower().endswith(('.xls', '.xlsx'))]
+
+    # Flags to see if user actually has PPT or Excel files to process
+    ppt_found = len(ppt_files) > 0
+    xls_found = len(xls_files) > 0
+
+    # Flags to check if required libs are missing
+    missing_ppt_deps = False
+    missing_xls_deps = False
+
+    # -------------------------------------------------------
+    # 2. If user has PPT files, try importing PPT dependencies
+    # -------------------------------------------------------
+    if ppt_found:
+        try:
+            from spire.presentation import Presentation, FileFormat
+        except ImportError:
+            missing_ppt_deps = True
+
+    # -------------------------------------------------------
+    # 3. If user has Excel files, try importing XLS dependencies
+    # -------------------------------------------------------
+    if xls_found:
+        try:
+            from asposecells.api import Workbook, ImageOrPrintOptions, SheetRender, SaveFormat
+        except ImportError:
+            missing_xls_deps = True
+
+    # -------------------------------------------------------
+    # 4. Raise combined error if both missing
+    # -------------------------------------------------------
+    if missing_ppt_deps and missing_xls_deps:
+        raise ImportError(
+            "Both Excel and PowerPoint files are detected, but their dependencies are missing.\n"
+            "Install both extras:  pip install \"reportminer[xls,ppt]\"\n"
+            "Or install all:       pip install \"reportminer[all]\""
+        )
+    elif missing_ppt_deps:
+        raise ImportError(
+            "PowerPoint files are detected, but PPT dependencies are missing.\n"
+            "Please install: pip install \"reportminer[ppt]\""
+        )
+    elif missing_xls_deps:
+        raise ImportError(
+            "Excel files are detected, but XLS dependencies are missing.\n"
+            "Please install: pip install \"reportminer[xls]\""
+        )
+
+    # -------------------------------------------------------
+    # 5. Process PDF files
+    # -------------------------------------------------------
+    pdf_files = [f for f in files if f.lower().endswith('.pdf')]
+    for pdf_file in pdf_files:
+        pdf_path = os.path.join(base_folder, pdf_file)
+        pdf_name = os.path.splitext(pdf_file)[0]
+        sub_folder = os.path.join(output_base_folder, pdf_name)
+        os.makedirs(sub_folder, exist_ok=True)
+
+        images = convert_from_path(pdf_path, dpi=dpi)
+        for i, img in enumerate(images):
+            image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
+            img.save(image_file_path, "JPEG")
+        print(f"PDF -> Images for '{pdf_file}' saved in folder: {sub_folder}")
+
+    # -------------------------------------------------------
+    # 6. Process PPT files
+    # -------------------------------------------------------
+    # By this point, if we got here, the spire.presentation library is available if needed.
+    if ppt_found and not missing_ppt_deps:
+        from spire.presentation import Presentation, FileFormat
+        for ppt_file in ppt_files:
+            ppt_path = os.path.join(base_folder, ppt_file)
+            ppt_name = os.path.splitext(ppt_file)[0]
+            sub_folder = os.path.join(output_base_folder, ppt_name)
+            os.makedirs(sub_folder, exist_ok=True)
+
+            pres = Presentation()
+            pres.LoadFromFile(ppt_path)
+
+            pdf_output_path = os.path.join(ppt_base_folder, f"{ppt_name}.pdf")
+            pres.SaveToFile(pdf_output_path, FileFormat.PDF)
+            pres.Dispose()
+
+            images = convert_from_path(pdf_output_path, dpi=dpi)
+            for i, img in enumerate(images):
+                image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
+                img.save(image_file_path, "JPEG")
+            print(f"PPT -> Images for '{ppt_file}' saved in folder: {sub_folder}")
+
+    # -------------------------------------------------------
+    # 7. Process Excel files
+    # -------------------------------------------------------
+    # Similarly, the Aspose.Cells import is valid here if needed.
+    if xls_found and not missing_xls_deps:
+        from asposecells.api import Workbook, ImageOrPrintOptions, SheetRender, SaveFormat
+        for xls_file in xls_files:
+            xls_path = os.path.join(base_folder, xls_file)
+            xls_name = os.path.splitext(xls_file)[0]
+            sub_folder = os.path.join(output_base_folder, xls_name)
+            os.makedirs(sub_folder, exist_ok=True)
+
+            workbook = Workbook(xls_path)
+            for sheet_index, worksheet in enumerate(workbook.worksheets):
+                img_options = ImageOrPrintOptions()
+                img_options.save_format = SaveFormat.JPG
+                img_options.horizontal_resolution = dpi
+                img_options.vertical_resolution = dpi
+
+                sheet_render = SheetRender(worksheet, img_options)
+                for page_number in range(sheet_render.page_count):
+                    output_filename = os.path.join(
+                        sub_folder, f"sheet_{sheet_index+1}_page_{page_number+1}.jpg"
+                    )
+                    sheet_render.to_image(page_number, output_filename)
+
+            print(f"XLS -> Images for '{xls_file}' saved in folder: {sub_folder}")
+
+    # -------------------------------------------------------
+    # 8. Index Documents (example)
+    # -------------------------------------------------------
+    docs_retrieval_model = models[0]
+    docs_retrieval_model.index(
+        input_path=base_folder,
+        index_name=index_name,
+        store_collection_with_index=False,
+        overwrite=True
+    )
+    models[0] = docs_retrieval_model
+
+    return models
+
+
 def PDF_folder(pdf_folder, models, dpi=200, index_name='rag'):
     """
     Converts PDF files into images and stores them in sub-folders named after the PDF files.
