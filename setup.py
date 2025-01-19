@@ -39,7 +39,10 @@ setup(
         'pillow>=11.1.0',
         'numpy>=1.26.4',
         'matplotlib>=3.10.0',
-        'pypdf2>=3.0.1'
+        'pypdf2>=3.0.1',
+        'aspose-cells-python>=25.1.0',
+        'aspose.slides>=24.12.0',
+        'spire.presentation'>=9.12.1
     ],
     classifiers=[
         'Development Status :: 1 - Planning',
