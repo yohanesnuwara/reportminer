@@ -143,7 +143,8 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
     # -------------------------------------------------------
     if ppt_found:
         try:
-            from spire.presentation import Presentation, FileFormat
+            from spire.presentation import *
+            from spire.presentation.common import *
         except ImportError:
             missing_ppt_deps = True
 
@@ -152,7 +153,8 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
     # -------------------------------------------------------
     if xls_found:
         try:
-            from asposecells.api import Workbook, ImageOrPrintOptions, SheetRender, SaveFormat
+            from aspose.cells import Workbook, SaveFormat
+            from aspose.cells.rendering import ImageOrPrintOptions, SheetRender
         except ImportError:
             missing_xls_deps = True
 
