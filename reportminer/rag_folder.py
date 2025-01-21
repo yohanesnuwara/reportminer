@@ -143,8 +143,7 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
     # -------------------------------------------------------
     if ppt_found:
         try:
-            from spire.presentation import *
-            from spire.presentation.common import *
+            from spire.presentation import Presentation, FileFormat
         except ImportError:
             missing_ppt_deps = True
 
