@@ -223,7 +223,9 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
     # -------------------------------------------------------
     # Similarly, the Aspose.Cells import is valid here if needed.
     if xls_found and not missing_xls_deps:
-        from asposecells.api import Workbook, ImageOrPrintOptions, SheetRender, SaveFormat
+        from aspose.cells import Workbook, SaveFormat
+        from aspose.cells.rendering import ImageOrPrintOptions, SheetRender
+        
         for xls_file in xls_files:
             xls_path = os.path.join(base_folder, xls_file)
             xls_name = os.path.splitext(xls_file)[0]
