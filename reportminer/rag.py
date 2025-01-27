@@ -6,6 +6,9 @@ import torch
 import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
+import nest_asyncio
+from lmdeploy import pipeline, TurbomindEngineConfig
+from lmdeploy.vl import load_image
 
 def PDF_folder(pdf_folder, models, dpi=200):
     """
