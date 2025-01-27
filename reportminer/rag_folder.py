@@ -6,6 +6,9 @@ import torch
 import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
+import nest_asyncio
+from lmdeploy import pipeline, TurbomindEngineConfig
+from lmdeploy.vl import load_image
 
 import glob
 import shutil
@@ -431,3 +434,42 @@ def Ask(text_query, models):
     source = [filename, page_num, score]
 
     return output_text[0], source, image
+
+def Ask2(text_query, models):
+    """
+    Perform question and answering task to document. Specifically for DeepSeek and other models hosted in LMDeploy.
+
+    Args:
+        text_query (str): Query for the document. Can be in a form of question.
+        models (list): List that consists embedding model, VL model, and VL processor.
+
+    Return:
+        Answer given from the VL model
+    """
+    # Retrieve docs retrieval model as the first element of model input
+    docs_retrieval_model = models[0]
+
+    # Read mapping of document ID to filename
+    doc_mapping = docs_retrieval_model.get_doc_ids_to_file_names()
+
+    # Run similarity search
+    results = docs_retrieval_model.search(text_query, k=1)
+
+    result = results[0]
+    doc_id = result['doc_id']
+    page_num = result['page_num']
+    score = result['score']
+    filename = doc_mapping[doc_id]
+    image = retrieve_image(filename, page_num)
+
+
+    # VL model and processor
+    model = models[1]
+
+    text_query = text_query + ' Answer briefly but explain more.'
+    output_text = model((text_query, image))
+
+    # Source of information
+    source = [filename, page_num, score]
+
+    return output_text.text, source, image
