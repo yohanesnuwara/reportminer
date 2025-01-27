@@ -192,6 +192,35 @@ def Ask(text_query, models):
     )
     return output_text[0]
 
+# def setup_model(embedding='vidore/colpali-v1.2', vlm='HuggingFaceTB/SmolVLM-Instruct'):
+#     """
+#     Install embedding model and visual language model
+
+#     Args:
+#         embedding (str): Model name of the embedding model from HuggingFace or Byaldi. Default is 'vidore/colpali-v1.2'.
+#         vlm (str): Model name of the visual language model from HuggingFace. Default is 'HuggingFaceTB/SmolVLM-Instruct'.
+#     """
+#     # Print selected model
+#     print('Selected embedding model:', embedding)
+#     print('Selected visual language model:', vlm)
+
+#     # Setup embedding model
+#     docs_retrieval_model = RAGMultiModalModel.from_pretrained(embedding)
+
+#     # Setup visual language model
+#     vl_model = Idefics3ForConditionalGeneration.from_pretrained(
+#         vlm,
+#         device_map="auto",
+#         torch_dtype=torch.bfloat16,
+#         _attn_implementation="eager",
+#     )
+#     vl_model.eval()
+
+#     # Setup VLM processor
+#     vl_processor = AutoProcessor.from_pretrained(vlm)    
+
+#     return [docs_retrieval_model, vl_model, vl_processor]
+
 def setup_model(embedding='vidore/colpali-v1.2', vlm='HuggingFaceTB/SmolVLM-Instruct'):
     """
     Install embedding model and visual language model
@@ -207,19 +236,29 @@ def setup_model(embedding='vidore/colpali-v1.2', vlm='HuggingFaceTB/SmolVLM-Inst
     # Setup embedding model
     docs_retrieval_model = RAGMultiModalModel.from_pretrained(embedding)
 
-    # Setup visual language model
-    vl_model = Idefics3ForConditionalGeneration.from_pretrained(
-        vlm,
-        device_map="auto",
-        torch_dtype=torch.bfloat16,
-        _attn_implementation="eager",
-    )
-    vl_model.eval()
+    if vlm in ['deepseek-ai/deepseek-vl-1.3b-chat']:
+        # Use LMDeploy
+        nest_asyncio.apply()
+        engine_config = TurbomindEngineConfig(cache_max_entry_count=0.3)
+        vl_model = pipeline(vlm, backend_config=engine_config)
+        
+        return [docs_retrieval_model, vl_model]
 
-    # Setup VLM processor
-    vl_processor = AutoProcessor.from_pretrained(vlm)    
 
-    return [docs_retrieval_model, vl_model, vl_processor]
+    else:
+        # Setup visual language model
+        vl_model = Idefics3ForConditionalGeneration.from_pretrained(
+            vlm,
+            device_map="auto",
+            torch_dtype=torch.bfloat16,
+            _attn_implementation="eager",
+        )
+        vl_model.eval()
+
+        # Setup VLM processor
+        vl_processor = AutoProcessor.from_pretrained(vlm)    
+
+        return [docs_retrieval_model, vl_model, vl_processor]
 
 
 def load_model_from_pretrained(pretrained_embedding_index_name, vlm='HuggingFaceTB/SmolVLM-Instruct'):
