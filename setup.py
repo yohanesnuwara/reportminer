@@ -23,7 +23,7 @@ with open(readme_path, "r", encoding="utf-8") as fh:
 
 setup(
     name='ReportMiner',
-    version='0.2.4',
+    version='0.2.3',
     description='Easy to use wrapper for text document question and answer using RAG and LLM',
     long_description=long_description,
     long_description_content_type="text/markdown",
