@@ -42,7 +42,8 @@ setup(
         'numpy>=1.26.4',
         'matplotlib>=3.10.0',
         'pypdf2>=3.0.1',
-        'lmdeploy>=0.7.0.post1'
+        'lmdeploy>=0.7.0.post1',
+        'nest-asyncio>=1.6.0'
     ],
 
     # Optional extras
