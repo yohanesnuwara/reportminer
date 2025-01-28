@@ -11,7 +11,7 @@ from lmdeploy import pipeline, TurbomindEngineConfig
 from lmdeploy.vl import load_image
 
 from spire.presentation import Presentation, FileFormat
-from pptx import Presentation
+# from pptx import Presentation
 from aspose.cells import Workbook, SaveFormat
 from aspose.cells.rendering import ImageOrPrintOptions, SheetRender
 
