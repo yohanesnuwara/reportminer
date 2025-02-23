@@ -7,3 +7,5 @@ apt-get install -y poppler-utils
 
 apt install -y libgdiplus
 ln -s /usr/lib/libgdiplus.so /usr/lib/libgdiplus
+
+pip install .[xls,ppt]
