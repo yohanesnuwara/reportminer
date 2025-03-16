@@ -64,7 +64,8 @@ setup(
         'all': [
             'aspose.slides>=24.12.0',
             'spire.presentation>=9.12.1',
-            'aspose-cells-python>=25.1.0'
+            'aspose-cells-python>=25.1.0',
+            'spire.doc>=13.1.0'
         ],
     },
 
