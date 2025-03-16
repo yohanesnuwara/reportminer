@@ -1,3 +1,4 @@
+# Run this TWICE 2x to force ttf-mscorefonts-installer installed then say 'Yes'
 # Run this shell file inside reportminer folder 
 apt-get install -y ttf-mscorefonts-installer 
 apt-get install fonts-dejavu
