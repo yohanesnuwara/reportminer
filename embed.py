@@ -27,18 +27,18 @@ def main():
 
     # Rename files uploaded using Runpodctl method
     destination_dir = base_dir 
-    os.makedirs(destination_dir, exist_ok=True)
+    rag_folder.normalize_folder_structure(base_dir, destination_dir)
+    # os.makedirs(destination_dir, exist_ok=True)
 
-    # Process all files recursively
-    for file_path in glob.glob(os.path.join(base_dir, "**"), recursive=True):
-        if os.path.isfile(file_path):
-            # Normalize the filename and extract just the name
-            filename = os.path.basename(file_path.replace("\\", "/"))
-            new_path = os.path.join(destination_dir, filename)
-            shutil.move(file_path, new_path)
-            print(f"Renamed: {file_path} -> {new_path}")
-
-    print("Renaming completed.")
+    # # Process all files recursively
+    # for file_path in glob.glob(os.path.join(base_dir, "**"), recursive=True):
+    #     if os.path.isfile(file_path):
+    #         # Normalize the filename and extract just the name
+    #         filename = os.path.basename(file_path.replace("\\", "/"))
+    #         new_path = os.path.join(destination_dir, filename)
+    #         shutil.move(file_path, new_path)
+    #         print(f"Renamed: {file_path} -> {new_path}")
+    # print("Renaming completed.")
 
     # Embed documents
     start_time = datetime.datetime.now()
