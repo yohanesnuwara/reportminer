@@ -126,19 +126,240 @@ def count_pdf_pages_in_subdirectories(root_directory):
 
     return df
 
+# def Process(base_folder, models, dpi=100, index_name='rag'):
+#     """
+#     Processes files in a folder based on their format (.xls, .ppt, .pdf) and applies specific processing.
+
+#     Args:
+#         base_folder (str): The path to the folder containing the files.
+#         models (list): List that consists of embedding model, VL model, and VL processor.
+#         dpi (int): The resolution of the images for PDF files. Default is 100.
+#         index_name (str): Index name for document retrieval.
+
+#     Returns:
+#         list: Updated models after processing files.
+#     """
+#     # Retrieve docs retrieval model as the first element of model input
+#     docs_retrieval_model = models[0]
+
+#     # Define output folder
+#     output_base_folder = os.path.join(os.getcwd(), 'saved_images')
+#     if not os.path.exists(output_base_folder):
+#         os.makedirs(output_base_folder)
+
+#     pdf_base_folder = os.path.join(os.getcwd(), 'pdf_copy')
+#     if not os.path.exists(pdf_base_folder):
+#         os.makedirs(pdf_base_folder)        
+
+#     # ppt_base_folder = os.path.join(os.getcwd(), 'converted_ppt')
+#     # if not os.path.exists(ppt_base_folder):
+#     #     os.makedirs(ppt_base_folder)
+
+#     # Get the list of files in the folder
+#     files = os.listdir(base_folder)
+
+#     # Process image files
+#     img_files = [f for f in files if f.endswith(('.jpg', '.jpeg', '.png', '.JPG', '.PNG'))]
+#     for img_file in img_files:
+#         print('Processing Image:', img_file)
+#         img_path = os.path.join(base_folder, img_file)
+#         img_name = os.path.splitext(img_file)[0]        
+#         sub_folder = os.path.join(output_base_folder, img_name)
+#         if not os.path.exists(sub_folder):
+#             os.makedirs(sub_folder)    
+
+#         # Convert image to PDF
+#         image = Image.open(img_path)
+#         if image.mode in ("RGBA", "P"):
+#             image = image.convert("RGB")
+        
+#         # Resize image
+#         width, height = image.size
+#         new_width, new_height = width // 2, height // 2
+#         image_resized = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+#         # Save as PDF
+#         pdf_output_path = os.path.join(pdf_base_folder, f"{img_name}.pdf")        
+#         image_resized.save(pdf_output_path)
+
+#         # Copy image to image folder
+#         image_file_path = os.path.join(sub_folder, f"page_1.jpg")
+#         shutil.copy(img_path, image_file_path)
+      
+
+#     # Process PDF files
+#     pdf_files = [f for f in files if f.endswith(('.pdf', '.PDF'))]
+#     for pdf_file in pdf_files:
+#         pdf_path = os.path.join(base_folder, pdf_file)
+#         pdf_name = os.path.splitext(pdf_file)[0]
+#         sub_folder = os.path.join(output_base_folder, pdf_name)
+#         if not os.path.exists(sub_folder):
+#             os.makedirs(sub_folder)
+
+#         # Convert the PDF to images
+#         images = convert_from_path(pdf_path, dpi=dpi)
+#         for i, img in enumerate(images):
+#             image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
+#             img.save(image_file_path, "JPEG")
+#         print(f"Images for '{pdf_file}' have been saved in folder: {sub_folder}")
+
+#         # Copy the PDF file to the output folder
+#         copied_pdf_path = os.path.join(pdf_base_folder, f"{pdf_file}")
+#         shutil.copy(pdf_path, copied_pdf_path)
+
+#     # Process Word files
+#     doc_files = [f for f in files if f.endswith(('.doc', '.docx'))]
+#     for doc_file in doc_files:
+#         print('Processing Word:', doc_file)
+#         doc_path = os.path.join(base_folder, doc_file)
+#         doc_name = os.path.splitext(doc_file)[0]
+#         sub_folder = os.path.join(output_base_folder, doc_name)
+#         if not os.path.exists(sub_folder):
+#             os.makedirs(sub_folder)
+
+#         # Convert DOC to PDF
+#         wordfile = Document()
+#         wordfile.LoadFromFile(doc_path)
+
+#         pdf_output_path = os.path.join(pdf_base_folder, f"{os.path.splitext(doc_file)[0]}.pdf")        
+
+
+#         wordfile.SaveToFile(pdf_output_path, spire.doc.FileFormat.PDF)
+#         wordfile.Dispose()
+
+#         # Convert PDF to images
+#         images = convert_from_path(pdf_output_path, dpi=dpi)
+#         for i, img in enumerate(images):
+#             image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
+#             img.save(image_file_path, "JPEG")
+
+#         print(f"Images for '{doc_file}' have been saved in folder: {sub_folder}")
+
+#     # Process Presentation files
+#     ppt_files = [f for f in files if f.endswith(('.ppt', '.pptx'))]
+#     for ppt_file in ppt_files:
+#         print('Processing PPT:', ppt_file)
+#         ppt_path = os.path.join(base_folder, ppt_file)
+#         ppt_name = os.path.splitext(ppt_file)[0]
+#         sub_folder = os.path.join(output_base_folder, ppt_name)
+#         if not os.path.exists(sub_folder):
+#             os.makedirs(sub_folder)
+
+#         # Convert PPT to PDF
+#         presentation = Presentation()
+#         presentation.LoadFromFile(ppt_path)
+
+#         # pdf_output_path = os.path.join(ppt_base_folder, f"{os.path.splitext(ppt_file)[0]}.pdf")
+#         pdf_output_path = os.path.join(pdf_base_folder, f"{os.path.splitext(ppt_file)[0]}.pdf")        
+
+
+#         presentation.SaveToFile(pdf_output_path, spire.presentation.FileFormat.PDF)
+#         presentation.Dispose()
+
+#         # Convert PDF to images
+#         images = convert_from_path(pdf_output_path, dpi=dpi)
+#         for i, img in enumerate(images):
+#             image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
+#             img.save(image_file_path, "JPEG")
+
+#         print(f"Images for '{ppt_file}' have been saved in folder: {sub_folder}")
+
+#     # Process Excel files
+#     xls_files = [f for f in files if f.endswith(('.xls', '.xlsx'))]
+#     for xls_file in xls_files:
+#         print('Processing XLS:', xls_file)
+#         xls_path = os.path.join(base_folder, xls_file)
+#         xls_name = os.path.splitext(xls_file)[0]
+#         sub_folder = os.path.join(output_base_folder, xls_name)
+#         if not os.path.exists(sub_folder):
+#             os.makedirs(sub_folder)
+
+#         # Load the Excel workbook using Aspose.Cells
+#         workbook = Workbook(xls_path)     
+
+#         # Convert the Excel workbook directly to PDF
+#         pdf_output_path = os.path.join(pdf_base_folder, f"{xls_name}.pdf")
+#         workbook.save(pdf_output_path, SaveFormat.PDF)   
+
+#         # Convert PDF to images
+#         images = convert_from_path(pdf_output_path, dpi=dpi)
+#         for i, img in enumerate(images):
+#             image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
+#             img.save(image_file_path, "JPEG")
+
+#         print(f"Images for '{xls_file}' have been saved in folder: {sub_folder}")
+
+#         # # Iterate through worksheets
+#         # for sheet_index, worksheet in enumerate(workbook.worksheets):
+#         #     imgOptions = ImageOrPrintOptions()
+#         #     imgOptions.save_format = SaveFormat.JPG  # Set the output format to JPG
+#         #     imgOptions.horizontal_resolution = dpi  # Set horizontal DPI (higher value for better resolution)
+#         #     imgOptions.vertical_resolution = dpi    # Set vertical DPI (higher value for better resolution)
+
+#         #     # Create a SheetRender object for the worksheet
+#         #     sheet_render = SheetRender(worksheet, imgOptions)
+
+#         #     # Render each page of the worksheet
+#         #     for page_number in range(sheet_render.page_count):
+#         #         # output_filename = os.path.join(sub_folder, f"page_{sheet_index + 1}_page_{page_number + 1}.jpg")
+#         #         output_filename = os.path.join(sub_folder, f"page_{sheet_index + 1}.jpg")
+#         #         sheet_render.to_image(page_number, output_filename)
+
+#         # print(f"Images for '{xls_file}' have been saved in folder: {sub_folder}")
+
+
+#     # Index documents using the embedding model
+#     docs_retrieval_model.index(
+#         input_path=pdf_base_folder, ### can be base_folder also 
+#         index_name=index_name,
+#         store_collection_with_index=False,
+#         overwrite=True
+#     )
+
+#     # Update models
+#     models[0] = docs_retrieval_model
+#     return models
+
 def Process(base_folder, models, dpi=100, index_name='rag'):
     """
     Processes files in a folder based on their format (.xls, .ppt, .pdf) and applies specific processing.
 
     Args:
-        base_folder (str): The path to the folder containing the files.
-        models (list): List that consists of embedding model, VL model, and VL processor.
-        dpi (int): The resolution of the images for PDF files. Default is 100.
-        index_name (str): Index name for document retrieval.
+        - base_folder (str): The path to the folder containing the files.
+
+        base_folder may have subfolder such as well name, and inside each there are subfolders
+
+        base_folder
+        \_well 1
+            \_ pdf1
+            \_subfolder 1.1
+                \_ excel2
+                \_ subfolder 1.1.1
+                    \_ jpg
+                \_ ...
+        \_well 2
+            \_ ...
+        \_well n
+            \_ ...
+
+        Later the individual files will be re-structured to be put each well folder
+            
+        - models (list): List that consists of embedding model, VL model, and VL processor.
+        - metadata (list of dict): List of dictionary of metadata. Can be well name or file path.
+        - dpi (int): The resolution of the images for PDF files. Default is 100.
+        - index_name (str): Index name for document retrieval.
 
     Returns:
         list: Updated models after processing files.
     """
+    # 1 - Normalize file structure inside the base folder
+    # Base folder have subfolders and we need to put all the files directly inside the well folder
+    destination_folder = base_folder
+
+    # The result is dataframe consist of filename, source file path (original), and renamed file path (after restructured)
+    df = normalize_folder_structure(base_folder, destination_folder)
+    
+    # 2 - Process files of different format
     # Retrieve docs retrieval model as the first element of model input
     docs_retrieval_model = models[0]
 
@@ -151,14 +372,11 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
     if not os.path.exists(pdf_base_folder):
         os.makedirs(pdf_base_folder)        
 
-    # ppt_base_folder = os.path.join(os.getcwd(), 'converted_ppt')
-    # if not os.path.exists(ppt_base_folder):
-    #     os.makedirs(ppt_base_folder)
 
     # Get the list of files in the folder
     files = os.listdir(base_folder)
 
-    # Process image files
+    # 2a - Process image files
     img_files = [f for f in files if f.endswith(('.jpg', '.jpeg', '.png', '.JPG', '.PNG'))]
     for img_file in img_files:
         print('Processing Image:', img_file)
@@ -187,7 +405,7 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
         shutil.copy(img_path, image_file_path)
       
 
-    # Process PDF files
+    # 2b - Process PDF files
     pdf_files = [f for f in files if f.endswith(('.pdf', '.PDF'))]
     for pdf_file in pdf_files:
         pdf_path = os.path.join(base_folder, pdf_file)
@@ -207,7 +425,7 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
         copied_pdf_path = os.path.join(pdf_base_folder, f"{pdf_file}")
         shutil.copy(pdf_path, copied_pdf_path)
 
-    # Process Word files
+    # 2c - Process Word files
     doc_files = [f for f in files if f.endswith(('.doc', '.docx'))]
     for doc_file in doc_files:
         print('Processing Word:', doc_file)
@@ -235,7 +453,7 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
 
         print(f"Images for '{doc_file}' have been saved in folder: {sub_folder}")
 
-    # Process Presentation files
+    # 2d - Process Presentation files
     ppt_files = [f for f in files if f.endswith(('.ppt', '.pptx'))]
     for ppt_file in ppt_files:
         print('Processing PPT:', ppt_file)
@@ -264,7 +482,7 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
 
         print(f"Images for '{ppt_file}' have been saved in folder: {sub_folder}")
 
-    # Process Excel files
+    # 2e - Process Excel files
     xls_files = [f for f in files if f.endswith(('.xls', '.xlsx'))]
     for xls_file in xls_files:
         print('Processing XLS:', xls_file)
@@ -289,30 +507,26 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
 
         print(f"Images for '{xls_file}' have been saved in folder: {sub_folder}")
 
-        # # Iterate through worksheets
-        # for sheet_index, worksheet in enumerate(workbook.worksheets):
-        #     imgOptions = ImageOrPrintOptions()
-        #     imgOptions.save_format = SaveFormat.JPG  # Set the output format to JPG
-        #     imgOptions.horizontal_resolution = dpi  # Set horizontal DPI (higher value for better resolution)
-        #     imgOptions.vertical_resolution = dpi    # Set vertical DPI (higher value for better resolution)
+    # 3 - Create file metadata for embedding model
 
-        #     # Create a SheetRender object for the worksheet
-        #     sheet_render = SheetRender(worksheet, imgOptions)
+    # Use glob to retrieve the files SEQUENTIALLY
+    # Collect all matching PDF files into a list
+    files = []
+    for f in glob.glob(pdf_base_folder + '/*'):
+        filename = f.split('/')[-1].split('.')[0]
+        files.append(filename)
 
-        #     # Render each page of the worksheet
-        #     for page_number in range(sheet_render.page_count):
-        #         # output_filename = os.path.join(sub_folder, f"page_{sheet_index + 1}_page_{page_number + 1}.jpg")
-        #         output_filename = os.path.join(sub_folder, f"page_{sheet_index + 1}.jpg")
-        #         sheet_render.to_image(page_number, output_filename)
+    # Create metadata dictionary from the globbed filepath
+    metadata = [{"path": source_path} for source_path in files]    
+     
 
-        # print(f"Images for '{xls_file}' have been saved in folder: {sub_folder}")
-
-
-    # Index documents using the embedding model
+    # 4 - Index documents using the embedding model
+    print('Indexing Documents with ColPali ...')
     docs_retrieval_model.index(
         input_path=pdf_base_folder, ### can be base_folder also 
         index_name=index_name,
         store_collection_with_index=False,
+        metadata=metadata, 
         overwrite=True
     )
 
