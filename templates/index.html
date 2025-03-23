@@ -5,10 +5,34 @@
   <title>GeoDataX: Retrieval Assistant for Technical Documents</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <!-- Link to your custom CSS -->
+
+  <!-- Link to your custom CSS (optional) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+
   <!-- jQuery -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!-- Inline styling to set the body background -->
+  <style>
+    body {
+      /* Use your own image path. For example "images/geodatax-bg.png" */
+      background: url("{{ url_for('static', filename='images/geodatax-bg.png') }}") 
+                  no-repeat center center fixed;
+      background-size: cover;
+
+      /* Optionally adjust margins, padding, font color, etc. */
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      color: #fff; /* White text if your background is dark */
+    }
+
+    /* If your .msger or other elements need translucent backgrounds, you can add something like: */
+    .msger {
+      background-color: rgba(0, 0, 0, 0.5); 
+      /* or remove background entirely if you want it transparent */
+    }
+  </style>
 </head>
 
 <body>
@@ -25,7 +49,11 @@
     <main class="msger-chat">
       <!-- Example initial bot message -->
       <div class="msg left-msg">
-        <div class="msg-img" style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')"></div>
+        <!-- Replace with your own avatar if you like -->
+        <div class="msg-img" 
+             style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')">
+        </div>
+        
         <div class="msg-bubble">
           <div class="msg-info">
             <div class="msg-info-name">Assistant</div>
@@ -36,7 +64,6 @@
           </div>
         </div>
       </div>
-
     </main>
 
     <form class="msger-inputarea">
@@ -95,7 +122,6 @@
           </div>
         </div>
       `;
-
       msgerChat.insertAdjacentHTML("beforeend", msgHTML);
       msgerChat.scrollTop = msgerChat.scrollHeight;
     }
@@ -110,7 +136,6 @@
         let answerHTML = data.answer.replace(/\n/g, "<br>");
 
         // 2) Combine text and image into one HTML string
-        //    The <img> src uses the base64 data
         let htmlContent = `
           ${answerHTML}
           <br><br>
@@ -120,7 +145,6 @@
             style="max-width: 300px; display: block; margin-top: 10px;"
           >
         `;
-
         // Create bot message bubble
         appendMessage(BOT_NAME, BOT_IMG, "left", htmlContent);
       });
@@ -133,6 +157,5 @@
       return `${h.slice(-2)}:${m.slice(-2)}`;
     }
   </script>
-
 </body>
 </html>
