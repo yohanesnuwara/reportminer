@@ -19,11 +19,14 @@ def chatbot_response(msg):
     # Ask the message
     res, source, image = rag_folder.Ask(msg, model)
     document, page, score = source
+
+    # Retrieve filepath
+    doc = rag_folder.retrieve_original_filepath(document)    
     
     # Prepare text answer
     answer_text = f"""{res}
 
-Source: {document}
+Source: {doc}
 Page: {page}"""
 
     # Convert PIL `image` to base64
