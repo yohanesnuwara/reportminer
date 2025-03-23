@@ -816,7 +816,9 @@ def retrieve_image(filename, page_num):
 
     """
     # Extract filename
-    filename = filename.split('/')[-1].split('.')[0]
+    # filename = filename.split('/')[-1].split('.')[0]
+    filename = filename.split('/')[-1].split('.')[:-1]
+    filename = '.'.join(filename)    
 
     output_base_folder = os.path.join(os.getcwd(), 'saved_images', filename)
     image_path = os.path.join(output_base_folder, f"page_{page_num}.jpg")
