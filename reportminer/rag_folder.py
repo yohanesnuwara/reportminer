@@ -775,3 +775,23 @@ def normalize_folder_structure(base_dir, destination_dir):
     df['filename'] = df['renamed_file_path'].apply(lambda x: os.path.splitext(os.path.basename(x))[0])
 
     return df
+
+def retrieve_original_filepath(embedded_pdf_filepath, folder_delimitter='__'):
+    """
+    Retrieve original filepath from embedded PDF filepath
+
+    GeoDataX filepath (or path metadata) is like this: ./pdf_copy/Pharos-1__Geophysics__seismic.pdf
+    The filepath has delimitter '__' that indicates the folder delimitter '/'
+    The task of this function to translate to original filepath: Pharos-1/Geophysics/seismic.pdf
+
+    Arguments:
+
+    embedded_pdf_filepath (path-like): Path to embedded PDF file 
+    folder_delimitter (char): Delimitter of filepath. Default: '__'
+
+    Output:
+
+    original_filepath (path-like): Original filepath in the local
+    """
+    original_filepath = '/'.join(os.path.splitext(embedded_pdf_filepath)[0].split('/')[-1].split(folder_delimitter))
+    return original_filepath
