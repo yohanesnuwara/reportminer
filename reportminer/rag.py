@@ -1,7 +1,7 @@
 import os
 from pdf2image import convert_from_path
 from byaldi import RAGMultiModalModel
-from transformers import Idefics3ForConditionalGeneration, AutoProcessor
+from transformers import Idefics3ForConditionalGeneration, AutoProcessor, AutoModelForCausalLM
 import torch
 import matplotlib.pyplot as plt
 from PIL import Image
