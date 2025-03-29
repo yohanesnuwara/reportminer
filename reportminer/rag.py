@@ -1,7 +1,7 @@
 import os
 from pdf2image import convert_from_path
 from byaldi import RAGMultiModalModel
-from transformers import Idefics3ForConditionalGeneration, AutoProcessor, AutoModelForCausalLM
+from transformers import Idefics3ForConditionalGeneration, AutoProcessor, AutoModelForCausalLM, Qwen2VLForConditionalGeneration
 import torch
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -9,6 +9,7 @@ import numpy as np
 import nest_asyncio
 from lmdeploy import pipeline, TurbomindEngineConfig
 from lmdeploy.vl import load_image
+import torch
 
 def PDF_folder(pdf_folder, models, dpi=200):
     """
@@ -263,6 +264,21 @@ def setup_model(embedding='vidore/colpali-v1.2', vlm='HuggingFaceTB/SmolVLM-Inst
 
         return [docs_retrieval_model, vl_model, vl_processor]
 
+def setup_model2():
+    # Setup embedding model
+    docs_retrieval_model = RAGMultiModalModel.from_pretrained("vidore/colpali-v1.2")    
+
+    vl_model = Qwen2VLForConditionalGeneration.from_pretrained(
+        "Qwen/Qwen2-VL-7B-Instruct", 
+        torch_dtype=torch.bfloat16, 
+        device_map="auto",
+        attn_implementation="flash_attention_2", 
+        trust_remote_code=True
+    )
+
+    vl_processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct")
+
+    return [docs_retrieval_model, vl_model, vl_processor]
 
 def load_model_from_pretrained(pretrained_embedding_index_name, vlm='HuggingFaceTB/SmolVLM-Instruct'):
     """
