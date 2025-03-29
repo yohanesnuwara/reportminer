@@ -43,7 +43,9 @@ setup(
         'matplotlib>=3.10.0',
         'pypdf2>=3.0.1',
         'lmdeploy>=0.7.0.post1',
-        'nest-asyncio>=1.6.0'
+        'nest-asyncio>=1.6.0',
+        'torch>=2.6.0+cu124',
+        'wheel>=0.45.1'
     ],
 
     # Optional extras
