@@ -15,3 +15,7 @@ python3 -m venv .venv
 pip install Flask
 pip install matplotlib
 pip install .[all]
+
+# install Qwen utils and flash attention
+pip install flash-attn==2.7.4.post1
+pip install qwen-vl-utils[decord]==0.0.8
