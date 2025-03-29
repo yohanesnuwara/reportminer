@@ -893,6 +893,12 @@ def Ask(text_query, models):
 
     chat_template = [
         {
+            "role": "system",
+            "content": [
+                {"type": "text", "text": "Format your answer into markdown."},
+            ],
+        },        
+        {
             "role": "user",
             "content": [
                 {
