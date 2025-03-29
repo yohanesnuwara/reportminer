@@ -23,7 +23,7 @@ def main():
     base_dir = args.i
 
     # Setup models ColPali and SMOL
-    rag_models = rag.setup_model()
+    rag_models = rag.setup_model2()
 
     # Rename files uploaded using Runpodctl method
     destination_dir = base_dir 
