@@ -931,6 +931,90 @@ def Ask(text_query, models):
 
     return output_text[0], source, image
 
+def Ask_iterative(text_query, models, k=3):
+    """
+    Perform question and answering task to document. Sourcing more than one document
+
+    Args:
+        text_query (str): Query for the document. Can be in a form of question.
+        models (list): List that consists embedding model, VL model, and VL processor.
+
+    Return:
+        Answer given from the VL model
+    """
+    # Retrieve docs retrieval model as the first element of model input
+    docs_retrieval_model = models[0]
+
+    # Read mapping of document ID to filename
+    doc_mapping = docs_retrieval_model.get_doc_ids_to_file_names()
+
+    # Run similarity search
+    results = docs_retrieval_model.search(text_query, k=k)
+    
+    outputs = []
+    sources = []
+    images = []
+    
+    for i in range(len(results)):
+        result = results[i]
+        doc_id = result['doc_id']
+        page_num = result['page_num']
+        score = result['score']
+        filename = doc_mapping[doc_id]
+        image = retrieve_image(filename, page_num)
+
+
+        # VL model and processor
+        model = models[1]
+        processor = models[2]
+
+        chat_template = [
+            {
+                "role": "system",
+                "content": [
+                    {"type": "text", "text": "Format your answer into markdown."},
+                ],
+            },        
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                    },
+                    {"type": "text", "text": text_query},
+                ],
+            }
+        ]
+
+        text = processor.apply_chat_template(chat_template, add_generation_prompt=True)
+
+        inputs = processor(
+            text=text,
+            images=[image],
+            return_tensors="pt",
+        )
+        inputs = inputs.to("cuda")
+
+        generated_ids = model.generate(**inputs, max_new_tokens=5000)
+        generated_ids_trimmed = [
+            out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+        ]
+        output_text = processor.batch_decode(
+            generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+        )
+        
+        output_text = output_text[0]
+        print(output_text)
+
+        # Source of information
+        source = [filename, page_num, score]
+
+        outputs.append(output_text)
+        sources.append(source)
+        images.append(image)
+
+    return outputs, sources, images
+
 def Ask2(text_query, models):
     """
     Perform question and answering task to document. Specifically for DeepSeek and other models hosted in LMDeploy.
