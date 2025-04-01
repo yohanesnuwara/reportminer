@@ -2,56 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GeoDataX: Retrieval Assistant for Technical Documents</title>
+  <title>GeoDataX: Retrieval Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-  <!-- Link to your custom CSS (optional) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 
   <!-- jQuery -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-  <!-- Inline styling to set the body background -->
+  <!-- Marked for parsing Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Your style -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+
   <style>
     body {
-      /* Use your own image path. For example "images/geodatax-bg.png" */
       background: url("{{ url_for('static', filename='images/geodatax-bg.png') }}") 
                   no-repeat center center fixed;
       background-size: cover;
-
-      /* Optionally adjust margins, padding, font color, etc. */
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      color: #fff; /* White text if your background is dark */
+      margin: 0; padding: 0; font-family: sans-serif; color: #fff;
     }
-
-    /* If your .msger or other elements need translucent backgrounds, you can add something like: */
     .msger {
-      background-color: rgba(0, 0, 0, 0.5); 
-      /* or remove background entirely if you want it transparent */
+      background-color: rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
 
 <body>
-
   <section class="msger">
     <header class="msger-header">
       <div class="msger-header-title">
         <i class="fas fa-bug"></i>
-        GeoDataX: Retrieval Assistant for Technical Documents
+        GeoDataX: Retrieval Assistant
         <i class="fas fa-bug"></i>
       </div>
     </header>
 
     <main class="msger-chat">
-      <!-- Example initial bot message -->
       <div class="msg left-msg">
-        <!-- Replace with your own avatar if you like -->
         <div class="msg-img" 
-             style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')">
+          style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')">
         </div>
         
         <div class="msg-bubble">
@@ -76,48 +65,36 @@
   <script src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script>
 
   <script>
-    // Grab elements we need from the DOM
     const msgerForm = document.querySelector(".msger-inputarea");
     const msgerInput = document.querySelector(".msger-input");
     const msgerChat = document.querySelector(".msger-chat");
 
-    // You can change these images/names to suit your needs
     const BOT_IMG = "https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802";
     const PERSON_IMG = "https://image.flaticon.com/icons/svg/145/145867.svg";
     const BOT_NAME = "Assistant";
     const PERSON_NAME = "You";
 
-    // When the user presses the "Send" button or hits Enter
     msgerForm.addEventListener("submit", event => {
-      event.preventDefault(); // don’t reload page
-
+      event.preventDefault(); 
       const msgText = msgerInput.value.trim();
       if (!msgText) return;
 
-      // User's own message bubble (right side)
       appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
-
-      // Clear input
       msgerInput.value = "";
 
-      // Fetch bot response
+      // Get the bot's response (Markdown)
       botResponse(msgText);
     });
 
-    // Append a new message bubble
     function appendMessage(name, img, side, htmlContent) {
       const msgHTML = `
         <div class="msg ${side}-msg">
-          <div
-            class="msg-img"
-            style="background-image: url(${img})"
-          ></div>
+          <div class="msg-img" style="background-image: url(${img})"></div>
           <div class="msg-bubble">
             <div class="msg-info">
               <div class="msg-info-name">${name}</div>
               <div class="msg-info-time">${formatDate(new Date())}</div>
             </div>
-            <!-- The message text can contain HTML, so it's inserted as innerHTML -->
             <div class="msg-text">${htmlContent}</div>
           </div>
         </div>
@@ -126,31 +103,30 @@
       msgerChat.scrollTop = msgerChat.scrollHeight;
     }
 
-    // Send user query to Flask and handle JSON response
     function botResponse(rawText) {
       $.get("/get", { msg: rawText }).done(function (data) {
-        // data should be: { answer: "...", image: "base64string..." }
+        // data: { answer: "...(Markdown text)...", image: "base64string" }
         console.log("Server Response: ", data);
 
-        // 1) Convert newlines in the answer to <br>
-        let answerHTML = data.answer.replace(/\n/g, "<br>");
+        // Convert the Markdown text into HTML using marked.js
+        const answerMarkdown = data.answer || "";
+        const answerHTML = marked.parse(answerMarkdown);
 
-        // 2) Combine text and image into one HTML string
+        // If there's an image, show it as well
         let htmlContent = `
           ${answerHTML}
-          <br><br>
+          <br>
           <img
             src="data:image/png;base64,${data.image}"
             alt="Response Image"
             style="max-width: 300px; display: block; margin-top: 10px;"
           >
         `;
-        // Create bot message bubble
+        // Append as the bot message
         appendMessage(BOT_NAME, BOT_IMG, "left", htmlContent);
       });
     }
 
-    // Utility for formatting the chat bubble timestamp
     function formatDate(date) {
       const h = "0" + date.getHours();
       const m = "0" + date.getMinutes();
