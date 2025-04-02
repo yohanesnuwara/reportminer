@@ -38,9 +38,10 @@
     </header>
 
     <main class="msger-chat">
+      <!-- Initial Bot message -->
       <div class="msg left-msg">
         <div class="msg-img" 
-          style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')">
+             style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')">
         </div>
         
         <div class="msg-bubble">
@@ -74,18 +75,21 @@
     const BOT_NAME = "Assistant";
     const PERSON_NAME = "You";
 
+    // Handle sending user's message
     msgerForm.addEventListener("submit", event => {
       event.preventDefault(); 
       const msgText = msgerInput.value.trim();
       if (!msgText) return;
 
+      // Show user's message (right bubble)
       appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
       msgerInput.value = "";
 
-      // Get the bot's response (Markdown)
+      // Fetch bot response
       botResponse(msgText);
     });
 
+    // Append a new message bubble to the chat
     function appendMessage(name, img, side, htmlContent) {
       const msgHTML = `
         <div class="msg ${side}-msg">
@@ -103,35 +107,25 @@
       msgerChat.scrollTop = msgerChat.scrollHeight;
     }
 
+    // Make request to the Flask endpoint and handle the multi-image response
     function botResponse(rawText) {
       $.get("/get", { msg: rawText }).done(function (data) {
-        // data: { answer: "...(Markdown text)...", image: "base64string" }
+        // data should be: 
+        // {
+        //   answer: "... (Markdown text) ...",
+        //   images: ["base64String1", "base64String2", ...]
+        // }
         console.log("Server Response: ", data);
 
-        // Convert the Markdown text into HTML using marked.js
+        // 1) Convert Markdown to HTML
         const answerMarkdown = data.answer || "";
         const answerHTML = marked.parse(answerMarkdown);
 
-        // If there's an image, show it as well
-        let htmlContent = `
-          ${answerHTML}
-          <br>
-          <img
-            src="data:image/png;base64,${data.image}"
-            alt="Response Image"
-            style="max-width: 300px; display: block; margin-top: 10px;"
-          >
-        `;
-        // Append as the bot message
-        appendMessage(BOT_NAME, BOT_IMG, "left", htmlContent);
-      });
-    }
-
-    function formatDate(date) {
-      const h = "0" + date.getHours();
-      const m = "0" + date.getMinutes();
-      return `${h.slice(-2)}:${m.slice(-2)}`;
-    }
-  </script>
-</body>
-</html>
+        // 2) Build HTML for all images in one bubble
+        let imagesHTML = "";
+        if (data.images && Array.isArray(data.images) && data.images.length) {
+          data.images.forEach((base64Img) => {
+            imagesHTML += `
+              <br>
+              <img
+                src="data:image/png;base64,${base64Img
