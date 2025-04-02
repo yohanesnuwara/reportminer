@@ -33,24 +33,47 @@ def run_embedding(base_dir):
     print('Embedding completed in:', finish_time - start_time)
 
 def chatbot_response(msg):
-    res, source, image = rag_folder.Ask(msg, rag_models)
-    document, page, score = source
+    # Ask the message with 2 relevant documents
+    responses, sources, images = rag_folder.Ask_iterative(msg, rag_models, k=2)
 
-    doc = rag_folder.retrieve_original_filepath(document)
+    # Prepare lists to hold the text and images
+    answer_parts = []
+    image_list = []
 
-    answer_text = f"""{res}
+    # Iterate through the 3 responses
+    for i in range(len(responses)):
+        res = responses[i]
+        document, page, score = sources[i]
+        image = images[i]
 
-Source: {doc}
-Page: {page}"""
+        doc = rag_folder.retrieve_original_filepath(document)
 
-    buffered = io.BytesIO()
-    image.save(buffered, format="PNG")
-    img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        # Build the text portion for this answer
+        text_segment = f"""{res}
 
+**Source**: {doc}
+**Page**: {page}"""
+
+        # Add the text portion to our list
+        answer_parts.append(text_segment)
+
+        # Convert the image to base64
+        buffered = io.BytesIO()
+        image.save(buffered, format="PNG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+        # Append the base64 image to a list
+        image_list.append(img_base64)
+
+    # Join all the text segments with two new lines between each
+    answer_text = "\n\n".join(answer_parts)
+
+    # Return a dict containing the combined text and the list of images
     return {
         "answer": answer_text,
-        "image": img_base64
+        "images": image_list
     }
+
 
 @app.route("/")
 def home():
@@ -68,4 +91,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     run_embedding(args.i)
-    app.run(port=5000)
+    app.run(port=5001)
