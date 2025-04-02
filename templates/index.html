@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GeoDataX: Beta Version</title>
+  <title>GeoDataX: Retrieval Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- jQuery -->
@@ -128,4 +128,28 @@
             imagesHTML += `
               <br>
               <img
-                src="data:image/png;base64,${base64Img
+                src="data:image/png;base64,${base64Img}"
+                alt="Response Image"
+                style="max-width: 300px; display: block; margin-top: 10px;"
+              >
+            `;
+          });
+        }
+
+        // 3) Combine text + images into a single bubble
+        const finalHTML = answerHTML + imagesHTML;
+
+        // 4) Append as a bot (left) message
+        appendMessage(BOT_NAME, BOT_IMG, "left", finalHTML);
+      });
+    }
+
+    // Utility: Format time for bubble timestamps
+    function formatDate(date) {
+      const h = "0" + date.getHours();
+      const m = "0" + date.getMinutes();
+      return `${h.slice(-2)}:${m.slice(-2)}`;
+    }
+  </script>
+</body>
+</html>
