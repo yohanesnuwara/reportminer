@@ -67,7 +67,7 @@ html, body {
    - Wider now: 450px
 */
 .msg-bubble {
-  max-width: 450px;       /* Increased from 300px to 450px */
+  max-width: 600px;       /* Increased from 300px to 450px */
   padding: 10px 15px;
   border-radius: 15px;
   background: #ececec;    /* Default bubble color (Assistant) */
