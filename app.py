@@ -91,4 +91,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     run_embedding(args.i)
-    app.run(port=5001)
+    # app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5001) # Run on VM for pilot
+    
