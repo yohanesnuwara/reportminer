@@ -1062,30 +1062,31 @@ def normalize_folder_structure(base_dir, destination_dir):
 
     for file_path in glob.glob(base_dir + "/**", recursive=True):
         if os.path.isfile(file_path):
-            # Replace backslashes in full path with underscores
-            normalized_name = file_path.replace("\\", "__").split("/")[-1]
+            try:
+                # Replace backslashes in full path with underscores
+                normalized_name = file_path.replace("\\", "__").split("/")[-1]
 
-            # Get parent folder and replace its backslashes too
-            parent_path = os.path.dirname(file_path).replace("\\", "__")
-            new_path = os.path.join(destination_dir, normalized_name)
+                # Get parent folder and replace its backslashes too
+                parent_path = os.path.dirname(file_path).replace("\\", "__")
+                new_path = os.path.join(destination_dir, normalized_name)
 
-            # Move the file
-            shutil.move(file_path, new_path)
+                # Move the file
+                shutil.move(file_path, new_path)
 
-            print(f"Renamed: {file_path} -> {new_path}")
+                print(f"Renamed: {file_path} -> {new_path}")
 
-            rename_records.append({
-                "source_file_path": file_path,
-                "renamed_file_path": new_path
-            })
+                rename_records.append({
+                    "source_file_path": file_path,
+                    "renamed_file_path": new_path
+                })
+
+            except PermissionError as e:
+                print(f"Permission denied: {file_path} - Skipping.")
+            except Exception as e:
+                print(f"Error processing {file_path}: {e} - Skipping.")
 
     print("Renaming completed.")
 
-    # Create a DataFrame for logging
-    df = pd.DataFrame(rename_records, columns=["source_file_path", "renamed_file_path"])
-    df['filename'] = df['renamed_file_path'].apply(lambda x: os.path.splitext(os.path.basename(x))[0])
-
-    return df
 
 def retrieve_original_filepath(embedded_pdf_filepath, folder_delimitter='__'):
     """
