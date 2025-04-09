@@ -670,35 +670,35 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
 
         print(f"Images for '{doc_file}' have been saved in folder: {sub_folder}")
 
-    # 2d - Process Presentation files
-    ppt_files = [f for f in files if f.endswith(('.ppt', '.pptx'))]
-    for ppt_file in ppt_files:
-        print('Processing PPT:', ppt_file)
-        ppt_path = os.path.join(base_folder, ppt_file)
-        # ppt_name = os.path.splitext(ppt_file)[0]
-        ppt_name = ppt_file
-        sub_folder = os.path.join(output_base_folder, ppt_name)
-        if not os.path.exists(sub_folder):
-            os.makedirs(sub_folder)
+    # # 2d - Process Presentation files
+    # ppt_files = [f for f in files if f.endswith(('.ppt', '.pptx'))]
+    # for ppt_file in ppt_files:
+    #     print('Processing PPT:', ppt_file)
+    #     ppt_path = os.path.join(base_folder, ppt_file)
+    #     # ppt_name = os.path.splitext(ppt_file)[0]
+    #     ppt_name = ppt_file
+    #     sub_folder = os.path.join(output_base_folder, ppt_name)
+    #     if not os.path.exists(sub_folder):
+    #         os.makedirs(sub_folder)
 
-        # Convert PPT to PDF
-        presentation = Presentation()
-        presentation.LoadFromFile(ppt_path)
+    #     # Convert PPT to PDF
+    #     presentation = Presentation()
+    #     presentation.LoadFromFile(ppt_path)
 
-        # pdf_output_path = os.path.join(ppt_base_folder, f"{os.path.splitext(ppt_file)[0]}.pdf")
-        pdf_output_path = os.path.join(pdf_base_folder, f"{ppt_name}.pdf")        
+    #     # pdf_output_path = os.path.join(ppt_base_folder, f"{os.path.splitext(ppt_file)[0]}.pdf")
+    #     pdf_output_path = os.path.join(pdf_base_folder, f"{ppt_name}.pdf")        
 
 
-        presentation.SaveToFile(pdf_output_path, spire.presentation.FileFormat.PDF)
-        presentation.Dispose()
+    #     presentation.SaveToFile(pdf_output_path, spire.presentation.FileFormat.PDF)
+    #     presentation.Dispose()
 
-        # Convert PDF to images
-        images = convert_from_path(pdf_output_path, dpi=dpi)
-        for i, img in enumerate(images):
-            image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
-            img.save(image_file_path, "JPEG")
+    #     # Convert PDF to images
+    #     images = convert_from_path(pdf_output_path, dpi=dpi)
+    #     for i, img in enumerate(images):
+    #         image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
+    #         img.save(image_file_path, "JPEG")
 
-        print(f"Images for '{ppt_file}' have been saved in folder: {sub_folder}")
+    #     print(f"Images for '{ppt_file}' have been saved in folder: {sub_folder}")
 
     # 2e - Process Excel files
     xls_files = [f for f in files if f.endswith(('.xls', '.xlsx'))]
