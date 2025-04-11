@@ -156,4 +156,37 @@
 
         // 1) Convert Markdown to HTML
         const answerMarkdown = data.answer || "";
-        const answerHTML = mark
+        const answerHTML = marked.parse(answerMarkdown);
+
+        // 2) Build HTML for all images in one bubble
+        let imagesHTML = "";
+        if (data.images && Array.isArray(data.images) && data.images.length) {
+          data.images.forEach((base64Img) => {
+            imagesHTML += `
+              <br>
+              <img
+                src="data:image/png;base64,${base64Img}"
+                alt="Response Image"
+                style="max-width: 300px; display: block; margin-top: 10px;"
+              >
+            `;
+          });
+        }
+
+        // 3) Combine text + images into a single bubble
+        const finalHTML = answerHTML + imagesHTML;
+
+        // 4) Append as a bot (left) message
+        appendMessage(BOT_NAME, BOT_IMG, "left", finalHTML);
+      });
+    }
+
+    // Utility: Format time for bubble timestamps
+    function formatDate(date) {
+      const h = "0" + date.getHours();
+      const m = "0" + date.getMinutes();
+      return `${h.slice(-2)}:${m.slice(-2)}`;
+    }
+  </script>
+</body>
+</html>
