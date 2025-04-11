@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GeoDataX: Beta Version</title>
+  <title>GeoDataX: Retrieval Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- jQuery -->
@@ -15,11 +15,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 
   <style>
+    /* Keep or remove these if you prefer putting them in style.css. */
     body {
-      background: url("{{ url_for('static', filename='images/geodatax-bg.png') }}") 
+      background: url("{{ url_for('static', filename='images/geodatax-bg.png') }}")
                   no-repeat center center fixed;
       background-size: cover;
-      margin: 0; padding: 0; font-family: sans-serif; color: #fff;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      color: #fff;
     }
     .msger {
       background-color: rgba(0, 0, 0, 0.5);
@@ -28,24 +32,52 @@
 </head>
 
 <body>
-  <section class="msger">
-    <header class="msger-header">
-      <div class="msger-header-title">
-        <i class="fas fa-bug"></i>
-        GeoDataX: Retrieval Assistant
-        <i class="fas fa-bug"></i>
-      </div>
-    </header>
+  <!-- 
+    1) WHITE TOP BAR
+    - Includes notification icon (clickable but does nothing)
+    - Includes profile pic + name
+    - Make sure the src paths match your static folder structure.
+  -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span class="app-title">GeoDataX - AI Assistant</span>
+    </div>
+    <div class="top-bar-right">
+      <!-- Notification icon (no real link) -->
+      <a href="javascript:void(0)" class="notification-btn">
+        <img 
+          src="{{ url_for('static', filename='images/notification.png') }}" 
+          alt="Notifications" 
+          class="notification-icon" 
+        />
+      </a>
 
+      <!-- Profile picture -->
+      <img 
+        src="{{ url_for('static', filename='images/person.png') }}" 
+        alt="Profile" 
+        class="profile-pic" 
+      />
+
+      <span class="profile-name">Admin</span>
+    </div>
+  </div>
+
+  <!-- 
+    2) ORIGINAL CHAT SECTION
+    - Your msger header + chat + input area 
+  -->
+  <section class="msger">
     <main class="msger-chat">
+      <!-- Initial Bot message -->
       <div class="msg left-msg">
         <div class="msg-img" 
-          style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')">
+             style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')">
         </div>
         
         <div class="msg-bubble">
           <div class="msg-info">
-            <div class="msg-info-name">Assistant</div>
+            <div class="msg-info-name">GeoDataX</div>
             <div class="msg-info-time">12:45</div>
           </div>
           <div class="msg-text">
@@ -57,7 +89,13 @@
 
     <form class="msger-inputarea">
       <input type="text" class="msger-input" id="textInput" placeholder="Enter your message...">
-      <button type="submit" class="msger-send-btn">Send</button>
+      <button type="submit" class="msger-send-btn">
+        <img
+          src="{{ url_for('static', filename='images/send.png') }}"
+          alt="Send Icon"
+          class="send-icon"
+        >
+      </button>
     </form>
   </section>
 
@@ -71,21 +109,24 @@
 
     const BOT_IMG = "https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802";
     const PERSON_IMG = "https://image.flaticon.com/icons/svg/145/145867.svg";
-    const BOT_NAME = "Assistant";
+    const BOT_NAME = "GeoDataX";
     const PERSON_NAME = "You";
 
+    // Handle sending user's message
     msgerForm.addEventListener("submit", event => {
       event.preventDefault(); 
       const msgText = msgerInput.value.trim();
       if (!msgText) return;
 
+      // Show user's message (right bubble)
       appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
       msgerInput.value = "";
 
-      // Get the bot's response (Markdown)
+      // Fetch bot response
       botResponse(msgText);
     });
 
+    // Append a new message bubble to the chat
     function appendMessage(name, img, side, htmlContent) {
       const msgHTML = `
         <div class="msg ${side}-msg">
@@ -103,35 +144,16 @@
       msgerChat.scrollTop = msgerChat.scrollHeight;
     }
 
+    // Make request to the Flask endpoint and handle the multi-image response
     function botResponse(rawText) {
       $.get("/get", { msg: rawText }).done(function (data) {
-        // data: { answer: "...(Markdown text)...", image: "base64string" }
+        // data should be: 
+        // {
+        //   answer: "... (Markdown text) ...",
+        //   images: ["base64String1", "base64String2", ...]
+        // }
         console.log("Server Response: ", data);
 
-        // Convert the Markdown text into HTML using marked.js
+        // 1) Convert Markdown to HTML
         const answerMarkdown = data.answer || "";
-        const answerHTML = marked.parse(answerMarkdown);
-
-        // If there's an image, show it as well
-        let htmlContent = `
-          ${answerHTML}
-          <br>
-          <img
-            src="data:image/png;base64,${data.image}"
-            alt="Response Image"
-            style="max-width: 300px; display: block; margin-top: 10px;"
-          >
-        `;
-        // Append as the bot message
-        appendMessage(BOT_NAME, BOT_IMG, "left", htmlContent);
-      });
-    }
-
-    function formatDate(date) {
-      const h = "0" + date.getHours();
-      const m = "0" + date.getMinutes();
-      return `${h.slice(-2)}:${m.slice(-2)}`;
-    }
-  </script>
-</body>
-</html>
+        const answerHTML = mark
