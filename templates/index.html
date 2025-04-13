@@ -32,12 +32,139 @@
 </head>
 
 <body>
-  <!-- 
-    1) WHITE TOP BAR
-    - Includes notification icon (clickable but does nothing)
-    - Includes profile pic + name
-    - Make sure the src paths match your static folder structure.
-  -->
+
+  <!-- 1) COLLAPSIBLE SIDEBAR -->
+  <div class="sidebar expanded" id="sidebar">
+    <div class="sidebar-header">
+      <!-- GeoDataX Logo -->
+      <div class="sidebar-logo-container">
+        <img
+          src="{{ url_for('static', filename='images/geodatax-logo.png') }}"
+          alt="GeoDataX Logo"
+          class="sidebar-logo"
+        />
+      </div>
+
+      <!-- Toggle Button (left arrow by default) -->
+      <button class="sidebar-toggle" id="toggleBtn">
+        <img
+          src="{{ url_for('static', filename='images/arrow-left.png') }}"
+          alt="Toggle Sidebar"
+          class="sidebar-toggle-icon"
+        />
+      </button>
+    </div>
+
+    <!-- Projects Section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">
+        Projects
+        <a href="javascript:void(0)" class="magnifier-btn">
+          <img
+            src="{{ url_for('static', filename='images/magnifier.png') }}"
+            alt="Magnifier Icon"
+            class="magnifier-icon"
+          />
+        </a>
+      </div>
+      <ul class="sidebar-menu">
+        <!-- First item: Use project.png -->
+        <li>
+          <a href="javascript:void(0)">
+            <img
+              src="{{ url_for('static', filename='images/project.png') }}"
+              alt="Project Icon"
+            />
+            New Project
+          </a>
+        </li>
+        <!-- Subsequent items: Use project-history.png -->
+        <li>
+          <a href="javascript:void(0)">
+            <img
+              src="{{ url_for('static', filename='images/project-history.png') }}"
+              alt="Project History Icon"
+            />
+            Kairo
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)">
+            <img
+              src="{{ url_for('static', filename='images/project-history.png') }}"
+              alt="Project History Icon"
+            />
+            Onyx
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Chats Section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">
+        Chats
+        <a href="javascript:void(0)" class="magnifier-btn">
+          <img
+            src="{{ url_for('static', filename='images/magnifier.png') }}"
+            alt="Magnifier Icon"
+            class="magnifier-icon"
+          />
+        </a>
+      </div>
+      <ul class="sidebar-menu">
+        <!-- First item: Use chat.png -->
+        <li>
+          <a href="javascript:void(0)">
+            <img
+              src="{{ url_for('static', filename='images/chat.png') }}"
+              alt="Chat Icon"
+            />
+            New Chat
+          </a>
+        </li>
+        <!-- Subsequent items: Use chat-history.png -->
+        <li>
+          <a href="javascript:void(0)">
+            <img
+              src="{{ url_for('static', filename='images/chat-history.png') }}"
+              alt="Chat History Icon"
+            />
+            Kronos PVT
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)">
+            <img
+              src="{{ url_for('static', filename='images/chat-history.png') }}"
+              alt="Chat History Icon"
+            />
+            DST rates
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Bottom Section: Settings & Help (side-by-side) -->
+    <div class="sidebar-section bottom-section">
+      <ul class="sidebar-menu">
+        <li>
+          <a href="javascript:void(0)">
+            <img src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings Icon" />
+            Settings
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)">
+            <img src="{{ url_for('static', filename='images/ask.png') }}" alt="Help Icon" />
+            Help
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2) WHITE TOP BAR -->
   <div class="top-bar">
     <div class="top-bar-left">
       <span class="app-title">GeoDataX - AI Assistant</span>
@@ -63,18 +190,15 @@
     </div>
   </div>
 
-  <!-- 
-    2) ORIGINAL CHAT SECTION
-    - Your msger header + chat + input area 
-  -->
+  <!-- 3) CHAT SECTION -->
   <section class="msger">
     <main class="msger-chat">
       <!-- Initial Bot message -->
       <div class="msg left-msg">
+        <!-- Left chat avatar uses logo.png -->
         <div class="msg-img" 
-             style="background-image: url('https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802')">
+             style="background-image: url('{{ url_for('static', filename='images/logo.png') }}')">
         </div>
-        
         <div class="msg-bubble">
           <div class="msg-info">
             <div class="msg-info-name">GeoDataX</div>
@@ -103,14 +227,47 @@
   <script src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script>
 
   <script>
-    const msgerForm = document.querySelector(".msger-inputarea");
-    const msgerInput = document.querySelector(".msger-input");
-    const msgerChat = document.querySelector(".msger-chat");
+    // -------------------------------------------
+    //  SIDEBAR TOGGLE LOGIC
+    // -------------------------------------------
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const msgerChat = document.querySelector('.msger-chat');
+    const msgerInputarea = document.querySelector('.msger-inputarea');
+    const topBar = document.querySelector('.top-bar'); // For sliding top bar
 
-    const BOT_IMG = "https://github.com/user-attachments/assets/1f10d830-e281-403f-b1b5-589d01e8c802";
-    const PERSON_IMG = "https://image.flaticon.com/icons/svg/145/145867.svg";
+    let isSidebarOpen = true;             // starts expanded
+    const expandedWidth = 240;            // Expanded sidebar width
+    const collapsedWidth = 30;            // Collapsed sidebar width
+
+    toggleBtn.addEventListener('click', () => {
+      isSidebarOpen = !isSidebarOpen;
+      if (isSidebarOpen) {
+        sidebar.classList.add('expanded');
+        toggleBtn.querySelector('img').src = "{{ url_for('static', filename='images/arrow-left.png') }}";
+        msgerChat.style.left = expandedWidth + "px";
+        msgerInputarea.style.left = expandedWidth + "px";
+        topBar.style.left = (expandedWidth + 1) + "px";
+      } else {
+        sidebar.classList.remove('expanded');
+        toggleBtn.querySelector('img').src = "{{ url_for('static', filename='images/arrow-right.png') }}";
+        msgerChat.style.left = collapsedWidth + "px";
+        msgerInputarea.style.left = collapsedWidth + "px";
+        topBar.style.left = (collapsedWidth + 1) + "px";
+      }
+    });
+
+    // -------------------------------------------
+    //  CHAT LOGIC
+    // -------------------------------------------
+    // Use local images for chat avatars:
+    const BOT_IMG = "{{ url_for('static', filename='images/logo.png') }}";
+    const PERSON_IMG = "{{ url_for('static', filename='images/person.png') }}";
     const BOT_NAME = "GeoDataX";
     const PERSON_NAME = "You";
+
+    const msgerForm = document.querySelector(".msger-inputarea");
+    const msgerInput = document.querySelector(".msger-input");
 
     // Handle sending user's message
     msgerForm.addEventListener("submit", event => {
@@ -118,11 +275,11 @@
       const msgText = msgerInput.value.trim();
       if (!msgText) return;
 
-      // Show user's message (right bubble)
+      // Append user's message (right bubble)
       appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
       msgerInput.value = "";
 
-      // Fetch bot response
+      // Simulate a bot response
       botResponse(msgText);
     });
 
@@ -144,16 +301,42 @@
       msgerChat.scrollTop = msgerChat.scrollHeight;
     }
 
-    // Make request to the Flask endpoint and handle the multi-image response
+    // Fake bot response (you can integrate with Flask as needed)
     function botResponse(rawText) {
       $.get("/get", { msg: rawText }).done(function (data) {
-        // data should be: 
-        // {
-        //   answer: "... (Markdown text) ...",
-        //   images: ["base64String1", "base64String2", ...]
-        // }
         console.log("Server Response: ", data);
 
-        // 1) Convert Markdown to HTML
+        // Convert Markdown to HTML
         const answerMarkdown = data.answer || "";
-        const answerHTML = mark
+        const answerHTML = marked.parse(answerMarkdown);
+
+        // Build HTML for images if provided
+        let imagesHTML = "";
+        if (data.images && Array.isArray(data.images) && data.images.length) {
+          data.images.forEach((base64Img) => {
+            imagesHTML += `
+              <br>
+              <img
+                src="data:image/png;base64,${base64Img}"
+                alt="Response Image"
+                style="max-width: 300px; display: block; margin-top: 10px;"
+              >
+            `;
+          });
+        }
+        const finalHTML = answerHTML + imagesHTML;
+
+        // Append bot (left) message using the new BOT_IMG
+        appendMessage(BOT_NAME, BOT_IMG, "left", finalHTML);
+      });
+    }
+
+    // Utility to format timestamps in message bubbles
+    function formatDate(date) {
+      const h = "0" + date.getHours();
+      const m = "0" + date.getMinutes();
+      return `${h.slice(-2)}:${m.slice(-2)}`;
+    }
+  </script>
+</body>
+</html>
