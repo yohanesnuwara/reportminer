@@ -1,8 +1,6 @@
-/* 
-  1) RESET & BODY
-  (You already had your background in index.html, 
-   so this just ensures full size, no margin/padding.)
-*/
+/* ---------------------------------------------------------
+   1) RESET & BODY
+--------------------------------------------------------- */
 html, body {
   margin: 0;
   padding: 0;
@@ -11,89 +9,219 @@ html, body {
   font-family: Helvetica, sans-serif;
 }
 
-/* 
-  2) TOP BAR STYLES
-  - White background bar at the top
-*/
+/* ---------------------------------------------------------
+   2) SIDEBAR
+   - Positioned below or overlapping the top bar.
+--------------------------------------------------------- */
+.sidebar {
+  position: fixed;
+  top: 0;          /* Start at the very top */
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background-color: #181F2B;
+  z-index: 9999;   /* Higher than the top bar */
+  color: #fff;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  border-right: 1px solid #181F2B;
+}
+
+/* When sidebar has the .expanded class */
+.sidebar.expanded {
+  width: 240px;
+}
+
+/* When sidebar does NOT have .expanded, collapse to 30px */
+.sidebar:not(.expanded) {
+  width: 40px;
+}
+
+/* Hide the logo and content in collapsed mode (only show the toggle arrow) */
+.sidebar:not(.expanded) .sidebar-logo-container,
+.sidebar:not(.expanded) .sidebar-section,
+.sidebar:not(.expanded) .bottom-section {
+  display: none;
+}
+
+/* Ensure the sidebar header remains visible, centering the toggle arrow */
+.sidebar:not(.expanded) .sidebar-header {
+  justify-content: center;
+  min-width: 40px;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  min-width: 60px;
+}
+.sidebar-logo-container {
+  display: flex;
+  align-items: center;
+}
+.sidebar-logo {
+  max-height: 90px;
+  transition: all 0.3s;
+}
+.sidebar-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: -6px;
+}
+.sidebar-toggle-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: -6px;
+}
+
+/* Sidebar Sections */
+.sidebar-section {
+  padding: 10px;
+  padding-left: 20px;
+  transition: all 0.3s;
+}
+.sidebar-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Title on left, icon on right */
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 15px;
+  color: #3BC6AC;
+}
+.magnifier-btn {
+  display: inline-block;
+  margin-left: 8px; /* Space between text and icon */
+  cursor: pointer;
+  text-decoration: none;
+}
+.magnifier-icon {
+  width: 20px;  /* Increased width */
+  height: 16px;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+  list-style: none;
+  padding-left: 10px;
+  margin-left: 10px;
+  margin: 0;
+}
+.sidebar-menu li {
+  margin: 8px 0;
+}
+.sidebar-menu li:first-child a {
+  font-weight: bold;
+}
+.sidebar-menu a {
+  text-decoration: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+.sidebar-menu a img {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+/* Bottom Section: Settings & Help arranged side-by-side */
+.bottom-section {
+  position: absolute;
+  bottom: 20px; /* Adjust as needed */
+  width: 100%;
+}
+.bottom-section .sidebar-menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+.bottom-section .sidebar-menu li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.bottom-section .sidebar-menu a img {
+  margin-left: -40px;
+}
+
+/* ---------------------------------------------------------
+   3) TOP BAR
+--------------------------------------------------------- */
 .top-bar {
+  position: fixed;
+  top: 0;
+  left: 241px;   /* This value will be updated by JavaScript */
+  right: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff;      /* White bar */
+  background-color: #fff;
   padding: 10px 20px;
   border-bottom: 1px solid #ddd;
+  z-index: 999;
+  transition: left 0.3s ease; /* Smooth slide when left offset changes */
 }
-
 .top-bar-left {
   display: flex;
   align-items: center;
 }
-
 .app-title {
   font-size: 20px;
   font-weight: 600;
   color: #333;
+  margin-left: 0;
 }
-
 .top-bar-right {
   display: flex;
   align-items: center;
 }
-
-/* Notification link (clickable but no real navigation) */
 .notification-btn {
   cursor: pointer;
-  margin-right: 15px; /* space between icon and profile pic */
-  text-decoration: none; /* remove default link styling */
+  margin-right: 15px;
+  text-decoration: none;
 }
-
 .notification-icon {
   width: 42px;
   height: 38px;
 }
-
-/* Profile picture (circular) */
 .profile-pic {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  margin-right: 10px; /* space between pic and name */
+  margin-right: 10px;
 }
-
 .profile-name {
   color: #333;
   font-size: 0.95rem;
 }
 
-/* 
-  3) CHAT AREA (msger + msger-chat)
-  - You had some inline styling in index.html for ".msger" (black background). 
-  - We'll keep your .msger style minimal here unless you want to move it.
-*/
+/* ---------------------------------------------------------
+   4) CHAT AREA (msger + msger-chat)
+--------------------------------------------------------- */
 .msger {
-  /* from index.html:
-     background-color: rgba(0, 0, 0, 0.5);
-     If you prefer, move that here instead of inline. */
+  /* Background already set inline in index.html */
 }
-
-/* 
-   3A) MAIN CHAT SCROLL AREA
-   - Moves it down 60px from the top so there's space above.
-   - Leaves 60px at the bottom for the input bar.
-*/
 .msger-chat {
   position: fixed;
-  top: 60px;      /* Lower from top by 60px (adjust as desired) */
-  left: 0;
+  top: 60px;      /* Below top bar */
+  left: 240px;    /* Default left offset; updated by JS on toggle */
   right: 0;
-  bottom: 60px;   /* Reserve space for the input bar */
+  bottom: 60px;   /* Reserve space for input area */
   overflow-y: auto;
   padding: 10px;
-
-  background: transparent; /* No box behind messages */
+  background: transparent;
+  transition: left 0.3s ease; /* Smooth transition for left offset */
 }
-
-/* Optional scrollbar styling */
 .msger-chat::-webkit-scrollbar {
   width: 6px;
 }
@@ -104,17 +232,12 @@ html, body {
   background: #bdbdbd;
 }
 
-/*
-   3B) MESSAGE BUBBLES
-   (Assistant on left, User on right)
-*/
+/* Message bubbles */
 .msg {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   margin-bottom: 10px;
 }
-
-/* Avatar image (optional) */
 .msg-img {
   width: 40px;
   height: 40px;
@@ -125,19 +248,12 @@ html, body {
   background-size: cover;
   border-radius: 50%;
 }
-
-/*
-   Bubble container
-   We increased from 300px to 600px to allow more text in the bubble
-*/
 .msg-bubble {
   max-width: 600px;
   padding: 10px 15px;
   border-radius: 15px;
-  background: #ececec; /* Default bubble color (Assistant) */
+  background: #ececec;
 }
-
-/* Info row inside each bubble */
 .msg-info {
   display: flex;
   justify-content: space-between;
@@ -149,51 +265,45 @@ html, body {
   font-size: 18px;
 }
 .msg-info-time {
-  font-size: 0.85em;
   font-size: 14px;
+  margin-left: 20px;
 }
-
-/* Assistant (LEFT) messages */
 .left-msg .msg-bubble {
   border-bottom-left-radius: 0;
   background: #181F2B;
   color: #fff;
-  margin-left: 40px; /* Indent from left screen edge */
+  margin-left: 10px;
   font-size: 16px;
 }
-
-/* User (RIGHT) messages */
 .right-msg {
   flex-direction: row-reverse;
 }
 .right-msg .msg-bubble {
   border-bottom-right-radius: 0;
-  background: #181F2B; /* New background color */
-  color: #fff;         /* White text */
-  margin-right: 40px;  /* Keep or adjust as you like */
+  background: #1D3C45;
+  color: #fff;
+  margin-right: 10px;
   font-size: 16px;
 }
 .right-msg .msg-img {
   margin: 0 0 0 10px;
 }
 
-/*
-   3C) FULL-WIDTH INPUT BAR fixed at the bottom 
-   for user text + "Send" button
-*/
+/* ---------------------------------------------------------
+   5) INPUT AREA
+--------------------------------------------------------- */
 .msger-inputarea {
   position: fixed;
-  bottom: 0; 
-  left: 0;
+  bottom: 0;
+  left: 240px;    /* Default left offset; updated by JS on toggle */
   right: 0;
   height: 60px;
-
   display: flex;
   align-items: center;
   padding: 10px;
-
   background: #eee;
   border-top: 2px solid #ddd;
+  transition: left 0.3s ease;
 }
 .msger-inputarea * {
   border: none;
@@ -202,27 +312,23 @@ html, body {
   margin: 0;
   padding: 10px;
 }
-
-/* The text field (flex: 1) + fixed-width send button */
 .msger-input {
   flex: 1;
   background: #ddd;
   font-size: 18px;
+  border-radius: 10px;
 }
-
 .msger-send-btn {
-  margin-left: 10px;   
-  background: none;    /* Remove the blue background */
-  border: none;        /* No border */
-  cursor: pointer;     /* Show pointer cursor on hover */
-  display: flex;       /* So you can easily center the icon */
+  margin-left: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;          /* Remove default button padding if you want */
+  padding: 0;
 }
-
-/* Control the size of your icon image */
 .msger-send-btn .send-icon {
-  width: 40px;  /* Adjust as desired */
+  width: 40px;
   height: 40px;
 }
