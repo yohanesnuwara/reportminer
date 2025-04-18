@@ -3,18 +3,31 @@ import os
 import datetime
 import io
 import base64
+import csv
 
-from flask import Flask, render_template, request, jsonify
+from flask import (
+    Flask, render_template, request, jsonify,
+    session, redirect, url_for, flash
+)
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
 from reportminer import rag, rag_folder
 
 app = Flask(__name__)
 app.static_folder = 'static'
 
-# Global variable to store models
+# ─── SECRET KEY & MAGIC FILE ────────────────────────────────────────────────
+app.secret_key = "replace_this_with_a_strong_secret"
+
+# Load credentials from magic.txt
+CREDENTIALS = {}
+with open("magic.txt") as mf:
+    reader = csv.DictReader(mf)
+    for row in reader:
+        CREDENTIALS[row["USERNAME"]] = row["PASSWORD"]
+
+
+# ─── RAG SETUP ───────────────────────────────────────────────────────────────
 rag_models = None
 
 def run_embedding(base_dir):
@@ -23,74 +36,83 @@ def run_embedding(base_dir):
     rag_models = rag.setup_model2()
 
     print('Normalizing folder structure...')
-    destination_dir = base_dir
-    rag_folder.normalize_folder_structure(base_dir, destination_dir)
+    rag_folder.normalize_folder_structure(base_dir, base_dir)
 
     print('Embedding documents...')
-    start_time = datetime.datetime.now()
+    start = datetime.datetime.now()
     rag_models = rag_folder.Process(base_dir, rag_models)
-    finish_time = datetime.datetime.now()
-    print('Embedding completed in:', finish_time - start_time)
+    print('Embedding completed in:', datetime.datetime.now() - start)
+
 
 def chatbot_response(msg):
-    # Ask the message with 2 relevant documents
     responses, sources, images = rag_folder.Ask_iterative(msg, rag_models, k=2)
+    answer_parts, image_list = [], []
 
-    # Prepare lists to hold the text and images
-    answer_parts = []
-    image_list = []
+    for i, res in enumerate(responses):
+        doc_path, page, _ = sources[i]
+        orig_file = rag_folder.retrieve_original_filepath(doc_path)
+        text_seg = f"""{res}
 
-    # Iterate through the 3 responses
-    for i in range(len(responses)):
-        res = responses[i]
-        document, page, score = sources[i]
-        image = images[i]
-
-        doc = rag_folder.retrieve_original_filepath(document)
-
-        # Build the text portion for this answer
-        text_segment = f"""{res}
-
-**Source**: {doc}
+**Source**: {orig_file}
 **Page**: {page}"""
+        answer_parts.append(text_seg)
 
-        # Add the text portion to our list
-        answer_parts.append(text_segment)
+        buf = io.BytesIO()
+        images[i].save(buf, format="PNG")
+        img_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+        image_list.append(img_b64)
 
-        # Convert the image to base64
-        buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
-        img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-        # Append the base64 image to a list
-        image_list.append(img_base64)
-
-    # Join all the text segments with two new lines between each
-    answer_text = "\n\n".join(answer_parts)
-
-    # Return a dict containing the combined text and the list of images
     return {
-        "answer": answer_text,
+        "answer": "\n\n".join(answer_parts),
         "images": image_list
     }
 
 
-@app.route("/")
-def home():
+# ─── LOGIN ROUTES ───────────────────────────────────────────────────────────
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        user = request.form["username"]
+        pwd  = request.form["password"]
+        if CREDENTIALS.get(user) == pwd:
+            session["user"] = user
+            return redirect(url_for("chat_ui"))
+        flash("Invalid username or password", "error")
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+# ─── CHAT UI & API ──────────────────────────────────────────────────────────
+
+@app.route("/app")
+def chat_ui():
+    if "user" not in session:
+        return redirect(url_for("login"))
     return render_template("index.html")
+
 
 @app.route("/get")
 def get_bot_response():
-    userText = request.args.get("msg")
-    response_data = chatbot_response(userText)
-    return jsonify(response_data)
+    if "user" not in session:
+        return jsonify({"error": "not authenticated"}), 401
+    userText = request.args.get("msg", "")
+    return jsonify(chatbot_response(userText))
 
+
+# ─── MAIN ───────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Flask chatbot with embedding.")
-    parser.add_argument('-i', type=str, required=True, help='Folder path to embed')
+    parser.add_argument('-i', required=True, help='Folder path to embed')
     args = parser.parse_args()
 
+    # 1) Do embedding BEFORE starting Flask
     run_embedding(args.i)
-    # app.run(host='0.0.0.0', port=5001)
-    app.run(host='0.0.0.0', port=5001) # Run on VM for pilot
-    
+
+    # 2) Start Flask WITHOUT the auto‑reloader so embedding only ran once
+    app.run(host='0.0.0.0', port=5001, debug=True, use_reloader=False)
