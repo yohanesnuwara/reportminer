@@ -1,10 +1,11 @@
 import os
 from pdf2image import convert_from_path
+from pdf2image.exceptions import PDFPageCountError
 from byaldi import RAGMultiModalModel
 from transformers import Idefics3ForConditionalGeneration, AutoProcessor
 import torch
 import matplotlib.pyplot as plt
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import numpy as np
 import nest_asyncio
 from lmdeploy import pipeline, TurbomindEngineConfig
@@ -582,7 +583,7 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
     if not os.path.exists(output_base_folder):
         os.makedirs(output_base_folder)
 
-    pdf_base_folder = os.path.join(os.getcwd(), 'pdf_copy')
+    pdf_base_folder = os.path.join(os.getcwd(), 'pdf_copy_galilee')
     if not os.path.exists(pdf_base_folder):
         os.makedirs(pdf_base_folder)        
 
@@ -591,55 +592,126 @@ def Process(base_folder, models, dpi=100, index_name='rag'):
     files = os.listdir(base_folder)
 
     # 2a - Process image files
-    img_files = [f for f in files if f.endswith(('.jpg', '.jpeg', '.png', '.JPG', '.PNG'))]
+    # img_files = [f for f in files if f.endswith(('.jpg', '.jpeg', '.png', '.JPG', '.PNG'))]
+    # for img_file in img_files:
+    #     print('Processing Image:', img_file)
+    #     img_path = os.path.join(base_folder, img_file)
+    #     # img_name = os.path.splitext(img_file)[0]   
+    #     img_name = img_file
+    #     sub_folder = os.path.join(output_base_folder, img_name)
+    #     if not os.path.exists(sub_folder):
+    #         os.makedirs(sub_folder)    
+
+    #     # Convert image to PDF
+    #     image = Image.open(img_path)
+    #     if image.mode in ("RGBA", "P"):
+    #         image = image.convert("RGB")
+        
+    #     # Resize image
+    #     width, height = image.size
+    #     new_width, new_height = width // 2, height // 2
+    #     image_resized = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+    #     # Save as PDF
+    #     pdf_output_path = os.path.join(pdf_base_folder, f"{img_name}.pdf")        
+    #     image_resized.save(pdf_output_path)
+
+    #     # Copy image to image folder
+    #     image_file_path = os.path.join(sub_folder, f"page_1.jpg")
+    #     shutil.copy(img_path, image_file_path)
+
+    # 2a - Process image files
+    img_files = [f for f in files if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
     for img_file in img_files:
         print('Processing Image:', img_file)
         img_path = os.path.join(base_folder, img_file)
-        # img_name = os.path.splitext(img_file)[0]   
-        img_name = img_file
-        sub_folder = os.path.join(output_base_folder, img_name)
-        if not os.path.exists(sub_folder):
-            os.makedirs(sub_folder)    
+        try:
+            image = Image.open(img_path)
+            if image.mode in ("RGBA", "P"):
+                image = image.convert("RGB")
 
-        # Convert image to PDF
-        image = Image.open(img_path)
-        if image.mode in ("RGBA", "P"):
-            image = image.convert("RGB")
-        
-        # Resize image
-        width, height = image.size
-        new_width, new_height = width // 2, height // 2
-        image_resized = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        
-        # Save as PDF
-        pdf_output_path = os.path.join(pdf_base_folder, f"{img_name}.pdf")        
-        image_resized.save(pdf_output_path)
+            width, height = image.size
+            # Compute new sizes
+            new_w, new_h = width // 2, height // 2
 
-        # Copy image to image folder
-        image_file_path = os.path.join(sub_folder, f"page_1.jpg")
-        shutil.copy(img_path, image_file_path)
-      
+            # 1) Guard zero or negative
+            if new_w < 1 or new_h < 1:
+                print(f"  Skipping resize: {img_file} is too small ({width}×{height}).")
+                continue
+
+            # 2) Now resize inside its own try/except
+            try:
+                image_resized = image.resize((new_w, new_h), Image.Resampling.LANCZOS)
+            except ValueError as e:
+                print(f"  ValueError on resize of {img_file}: {e}. Skipping.")
+                continue
+
+            # Save PDF
+            pdf_output_path = os.path.join(pdf_base_folder, f"{img_file}.pdf")
+            image_resized.save(pdf_output_path)
+
+            # Copy back to your subfolder
+            sub_folder = os.path.join(output_base_folder, img_file)
+            os.makedirs(sub_folder, exist_ok=True)
+            shutil.copy(img_path, os.path.join(sub_folder, "page_1.jpg"))
+
+        except UnidentifiedImageError:
+            print(f"  UnidentifiedImageError: can't open {img_file}. Skipping.")
+        except Exception as e:
+            print(f"  Unexpected error on {img_file}: {e}")      
+
+    # # 2b - Process PDF files
+    # pdf_files = [f for f in files if f.endswith(('.pdf', '.PDF'))]
+    # for pdf_file in pdf_files:
+    #     pdf_path = os.path.join(base_folder, pdf_file)
+    #     # pdf_name = os.path.splitext(pdf_file)[0]
+    #     pdf_name = pdf_file
+    #     sub_folder = os.path.join(output_base_folder, pdf_name)
+    #     if not os.path.exists(sub_folder):
+    #         os.makedirs(sub_folder)
+
+    #     # Convert the PDF to images
+    #     images = convert_from_path(pdf_path, dpi=dpi)
+    #     for i, img in enumerate(images):
+    #         image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
+    #         img.save(image_file_path, "JPEG")
+    #     print(f"Images for '{pdf_file}' have been saved in folder: {pdf_name}")
+
+    #     # Copy the PDF file to the output folder
+    #     copied_pdf_path = os.path.join(pdf_base_folder, f"{pdf_name}.pdf")
+    #     shutil.copy(pdf_path, copied_pdf_path)
 
     # 2b - Process PDF files
-    pdf_files = [f for f in files if f.endswith(('.pdf', '.PDF'))]
+    pdf_files = [f for f in files if f.lower().endswith('.pdf')]
     for pdf_file in pdf_files:
         pdf_path = os.path.join(base_folder, pdf_file)
-        # pdf_name = os.path.splitext(pdf_file)[0]
-        pdf_name = pdf_file
-        sub_folder = os.path.join(output_base_folder, pdf_name)
-        if not os.path.exists(sub_folder):
-            os.makedirs(sub_folder)
+        sub_folder = os.path.join(output_base_folder, pdf_file)
+        os.makedirs(sub_folder, exist_ok=True)
 
-        # Convert the PDF to images
-        images = convert_from_path(pdf_path, dpi=dpi)
+        # 1) Quick pre‐check: file exists & isn’t too small
+        if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) < 1024:
+            print(f"Skipping {pdf_file}: file missing or too small to be a valid PDF.")
+            continue
+
+        try:
+            images = convert_from_path(pdf_path, dpi=dpi)
+        except PDFPageCountError:
+            print(f"PDFPageCountError: Cannot read page count for '{pdf_file}'. Skipping.")
+            continue
+        except ValueError as ve:
+            # sometimes pdfinfo raises raw ValueError
+            print(f"ValueError reading '{pdf_file}': {ve}. Skipping.")
+            continue
+        except Exception as e:
+            # catch any other unexpected error
+            print(f"Unexpected error for '{pdf_file}': {e}. Skipping.")
+            continue
+
+        # if we get here, conversion succeeded
         for i, img in enumerate(images):
-            image_file_path = os.path.join(sub_folder, f"page_{i + 1}.jpg")
-            img.save(image_file_path, "JPEG")
-        print(f"Images for '{pdf_file}' have been saved in folder: {pdf_name}")
-
-        # Copy the PDF file to the output folder
-        copied_pdf_path = os.path.join(pdf_base_folder, f"{pdf_name}.pdf")
-        shutil.copy(pdf_path, copied_pdf_path)
+            out_path = os.path.join(sub_folder, f"page_{i+1}.jpg")
+            img.save(out_path, "JPEG")
+        print(f"Successfully processed '{pdf_file}' into {len(images)} images.")    
 
     # 2c - Process Word files
     doc_files = [f for f in files if f.endswith(('.doc', '.docx'))]
@@ -904,7 +976,7 @@ def Ask(text_query, models):
                 {
                     "type": "image",
                 },
-                {"type": "text", "text": text_query},
+                {"type": "text", "text": "Elaborate your answer in sentences. Do not give just short answer. Give more explanation based on the page." + text_query},
             ],
         }
     ]
@@ -981,7 +1053,7 @@ def Ask_iterative(text_query, models, k=3):
                     {
                         "type": "image",
                     },
-                    {"type": "text", "text": text_query},
+                    {"type": "text", "text": "Elaborate your answer in sentences. Do not give just short answer. Give more explanation based on the page." + text_query},
                 ],
             }
         ]
