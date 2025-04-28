@@ -332,3 +332,18 @@ html, body {
   width: 40px;
   height: 40px;
 }
+
+/* underlines and colors the “Response X” headers */
+.response-label {
+  color: #3BC6AC;
+  font-weight: bold;
+  text-decoration: underline;
+  margin-bottom: 8px;
+}
+
+/* makes any element with .source-text green & smaller */
+.source-text {
+  color: #3BC6AC;
+  font-size: 0.85em;
+  margin-top: 8px;
+}
