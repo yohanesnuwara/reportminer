@@ -115,4 +115,4 @@ if __name__ == "__main__":
     run_embedding(args.i)
 
     # 2) Start Flask WITHOUT the auto‑reloader so embedding only ran once
-    app.run(host='0.0.0.0', port=5001, debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
