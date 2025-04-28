@@ -7,15 +7,13 @@
 
   <!-- jQuery -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
   <!-- Marked for parsing Markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-  <!-- Your style -->
+  <!-- Your main stylesheet -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 
   <style>
-    /* Keep or remove these if you prefer putting them in style.css. */
+    /* your existing inline styles */
     body {
       background: url("{{ url_for('static', filename='images/geodatax-bg.png') }}")
                   no-repeat center center fixed;
@@ -28,6 +26,25 @@
     .msger {
       background-color: rgba(0, 0, 0, 0.5);
     }
+
+    /* ─────────────────────────────────────────────────────────────
+       underlined green response labels
+    ───────────────────────────────────────────────────────────── */
+    .response-label {
+      text-decoration: underline;
+      color: #3BC6AC;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       green, smaller “Source: …”
+    ───────────────────────────────────────────────────────────── */
+    .source-text {
+      color: #3BC6AC;
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
   </style>
 </head>
 
@@ -36,7 +53,6 @@
   <!-- 1) COLLAPSIBLE SIDEBAR -->
   <div class="sidebar expanded" id="sidebar">
     <div class="sidebar-header">
-      <!-- GeoDataX Logo -->
       <div class="sidebar-logo-container">
         <img
           src="{{ url_for('static', filename='images/geodatax-logo.png') }}"
@@ -44,8 +60,6 @@
           class="sidebar-logo"
         />
       </div>
-
-      <!-- Toggle Button (left arrow by default) -->
       <button class="sidebar-toggle" id="toggleBtn">
         <img
           src="{{ url_for('static', filename='images/arrow-left.png') }}"
@@ -55,7 +69,7 @@
       </button>
     </div>
 
-    <!-- Projects Section -->
+    <!-- Projects -->
     <div class="sidebar-section">
       <div class="sidebar-section-title">
         Projects
@@ -68,39 +82,28 @@
         </a>
       </div>
       <ul class="sidebar-menu">
-        <!-- First item: Use project.png -->
         <li>
           <a href="javascript:void(0)">
-            <img
-              src="{{ url_for('static', filename='images/project.png') }}"
-              alt="Project Icon"
-            />
+            <img src="{{ url_for('static', filename='images/project.png') }}" alt="Project Icon" />
             New Project
           </a>
         </li>
-        <!-- Subsequent items: Use project-history.png -->
         <li>
           <a href="javascript:void(0)">
-            <img
-              src="{{ url_for('static', filename='images/project-history.png') }}"
-              alt="Project History Icon"
-            />
+            <img src="{{ url_for('static', filename='images/project-history.png') }}" alt="Project History Icon" />
             Kairo
           </a>
         </li>
         <li>
           <a href="javascript:void(0)">
-            <img
-              src="{{ url_for('static', filename='images/project-history.png') }}"
-              alt="Project History Icon"
-            />
+            <img src="{{ url_for('static', filename='images/project-history.png') }}" alt="Project History Icon" />
             Onyx
           </a>
         </li>
       </ul>
     </div>
 
-    <!-- Chats Section -->
+    <!-- Chats -->
     <div class="sidebar-section">
       <div class="sidebar-section-title">
         Chats
@@ -113,39 +116,28 @@
         </a>
       </div>
       <ul class="sidebar-menu">
-        <!-- First item: Use chat.png -->
         <li>
           <a href="javascript:void(0)">
-            <img
-              src="{{ url_for('static', filename='images/chat.png') }}"
-              alt="Chat Icon"
-            />
+            <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Chat Icon" />
             New Chat
           </a>
         </li>
-        <!-- Subsequent items: Use chat-history.png -->
         <li>
           <a href="javascript:void(0)">
-            <img
-              src="{{ url_for('static', filename='images/chat-history.png') }}"
-              alt="Chat History Icon"
-            />
+            <img src="{{ url_for('static', filename='images/chat-history.png') }}" alt="Chat History Icon" />
             Kronos PVT
           </a>
         </li>
         <li>
           <a href="javascript:void(0)">
-            <img
-              src="{{ url_for('static', filename='images/chat-history.png') }}"
-              alt="Chat History Icon"
-            />
+            <img src="{{ url_for('static', filename='images/chat-history.png') }}" alt="Chat History Icon" />
             DST rates
           </a>
         </li>
       </ul>
     </div>
 
-    <!-- Bottom Section: Settings & Help (side-by-side) -->
+    <!-- Settings & Help -->
     <div class="sidebar-section bottom-section">
       <ul class="sidebar-menu">
         <li>
@@ -164,39 +156,34 @@
     </div>
   </div>
 
-  <!-- 2) WHITE TOP BAR -->
+  <!-- 2) TOP BAR -->
   <div class="top-bar">
     <div class="top-bar-left">
       <span class="app-title">GeoDataX - AI Assistant</span>
     </div>
     <div class="top-bar-right">
-      <!-- Notification icon (no real link) -->
       <a href="javascript:void(0)" class="notification-btn">
-        <img 
-          src="{{ url_for('static', filename='images/notification.png') }}" 
-          alt="Notifications" 
-          class="notification-icon" 
+        <img
+          src="{{ url_for('static', filename='images/notification.png') }}"
+          alt="Notifications"
+          class="notification-icon"
         />
       </a>
-
-      <!-- Profile picture -->
-      <img 
-        src="{{ url_for('static', filename='images/person.png') }}" 
-        alt="Profile" 
-        class="profile-pic" 
+      <img
+        src="{{ url_for('static', filename='images/person.png') }}"
+        alt="Profile"
+        class="profile-pic"
       />
-
       <span class="profile-name">Admin</span>
     </div>
   </div>
 
-  <!-- 3) CHAT SECTION -->
+  <!-- 3) CHAT -->
   <section class="msger">
     <main class="msger-chat">
-      <!-- Initial Bot message -->
+      <!-- initial greeting -->
       <div class="msg left-msg">
-        <!-- Left chat avatar uses logo.png -->
-        <div class="msg-img" 
+        <div class="msg-img"
              style="background-image: url('{{ url_for('static', filename='images/logo.png') }}')">
         </div>
         <div class="msg-bubble">
@@ -212,86 +199,81 @@
     </main>
 
     <form class="msger-inputarea">
-      <input type="text" class="msger-input" id="textInput" placeholder="Enter your message...">
+      <input
+        type="text"
+        class="msger-input"
+        id="textInput"
+        placeholder="Enter your message..."
+        autocomplete="off"
+      />
       <button type="submit" class="msger-send-btn">
         <img
           src="{{ url_for('static', filename='images/send.png') }}"
           alt="Send Icon"
           class="send-icon"
-        >
+        />
       </button>
     </form>
   </section>
 
-  <!-- FontAwesome icons -->
+  <!-- FontAwesome for any icons -->
   <script src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script>
 
   <script>
-    // -------------------------------------------
-    //  SIDEBAR TOGGLE LOGIC
-    // -------------------------------------------
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleBtn');
-    const msgerChat = document.querySelector('.msger-chat');
-    const msgerInputarea = document.querySelector('.msger-inputarea');
-    const topBar = document.querySelector('.top-bar'); // For sliding top bar
-
-    let isSidebarOpen = true;             // starts expanded
-    const expandedWidth = 240;            // Expanded sidebar width
-    const collapsedWidth = 30;            // Collapsed sidebar width
+    // Sidebar toggle logic (unchanged)
+    const sidebar       = document.getElementById('sidebar');
+    const toggleBtn     = document.getElementById('toggleBtn');
+    const msgerChat     = document.querySelector('.msger-chat');
+    const msgerInput    = document.querySelector('.msger-inputarea');
+    const topBar        = document.querySelector('.top-bar');
+    let   isSidebarOpen = true;
+    const expandedWidth = 240;
+    const collapsedWidth= 30;
 
     toggleBtn.addEventListener('click', () => {
       isSidebarOpen = !isSidebarOpen;
       if (isSidebarOpen) {
         sidebar.classList.add('expanded');
         toggleBtn.querySelector('img').src = "{{ url_for('static', filename='images/arrow-left.png') }}";
-        msgerChat.style.left = expandedWidth + "px";
-        msgerInputarea.style.left = expandedWidth + "px";
-        topBar.style.left = (expandedWidth + 1) + "px";
+        msgerChat.style.left  = expandedWidth + "px";
+        msgerInput.style.left = expandedWidth + "px";
+        topBar.style.left      = (expandedWidth + 1) + "px";
       } else {
         sidebar.classList.remove('expanded');
         toggleBtn.querySelector('img').src = "{{ url_for('static', filename='images/arrow-right.png') }}";
-        msgerChat.style.left = collapsedWidth + "px";
-        msgerInputarea.style.left = collapsedWidth + "px";
-        topBar.style.left = (collapsedWidth + 1) + "px";
+        msgerChat.style.left  = collapsedWidth + "px";
+        msgerInput.style.left = collapsedWidth + "px";
+        topBar.style.left      = (collapsedWidth + 1) + "px";
       }
     });
 
-    // -------------------------------------------
-    //  CHAT LOGIC
-    // -------------------------------------------
-    // Use local images for chat avatars:
-    const BOT_IMG = "{{ url_for('static', filename='images/logo.png') }}";
-    const PERSON_IMG = "{{ url_for('static', filename='images/person.png') }}";
-    const BOT_NAME = "GeoDataX";
+    // Chat logic
+    const BOT_IMG     = "{{ url_for('static', filename='images/logo.png') }}";
+    const PERSON_IMG  = "{{ url_for('static', filename='images/person.png') }}";
+    const BOT_NAME    = "GeoDataX";
     const PERSON_NAME = "You";
 
-    const msgerForm = document.querySelector(".msger-inputarea");
-    const msgerInput = document.querySelector(".msger-input");
-
-    // Handle sending user's message
-    msgerForm.addEventListener("submit", event => {
-      event.preventDefault(); 
-      const msgText = msgerInput.value.trim();
-      if (!msgText) return;
-
-      // Append user's message (right bubble)
-      appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
-      msgerInput.value = "";
-
-      // Simulate a bot response
-      botResponse(msgText);
+    document.querySelector(".msger-inputarea").addEventListener("submit", event => {
+      event.preventDefault();
+      const input = document.getElementById("textInput");
+      const text  = input.value.trim();
+      if (!text) return;
+      appendMessage(PERSON_NAME, PERSON_IMG, "right", text);
+      input.value = "";
+      botResponse(text);
     });
 
-    // Append a new message bubble to the chat
     function appendMessage(name, img, side, htmlContent) {
+      const now = new Date();
+      const hh  = ("0"+now.getHours()).slice(-2);
+      const mm  = ("0"+now.getMinutes()).slice(-2);
       const msgHTML = `
         <div class="msg ${side}-msg">
           <div class="msg-img" style="background-image: url(${img})"></div>
           <div class="msg-bubble">
             <div class="msg-info">
               <div class="msg-info-name">${name}</div>
-              <div class="msg-info-time">${formatDate(new Date())}</div>
+              <div class="msg-info-time">${hh}:${mm}</div>
             </div>
             <div class="msg-text">${htmlContent}</div>
           </div>
@@ -301,42 +283,92 @@
       msgerChat.scrollTop = msgerChat.scrollHeight;
     }
 
-    // Fake bot response (you can integrate with Flask as needed)
     function botResponse(rawText) {
-      $.get("/get", { msg: rawText }).done(function (data) {
-        console.log("Server Response: ", data);
+      $.get("/get", { msg: rawText }).done(function(data) {
+        // 1) split on exactly two blank lines
+        const parts = data.answer.split(/\n{2}/);
+        const resp1 = parts.slice(0,2).join("\n\n");
+        const resp2 = parts.slice(2).join("\n\n");
 
-        // Convert Markdown to HTML
-        const answerMarkdown = data.answer || "";
-        const answerHTML = marked.parse(answerMarkdown);
+        // 2) parse markdown & convert any <p>Source:…</p> to your .source-text
+        let html1 = marked.parse(resp1)
+                         .replace(
+                           /<p>\s*Source:(.*?)<\/p>/gi,
+                           '<div class="source-text">Source:$1</div>'
+                         );
+        let html2 = marked.parse(resp2)
+                         .replace(
+                           /<p>\s*Source:(.*?)<\/p>/gi,
+                           '<div class="source-text">Source:$1</div>'
+                         );
 
-        // Build HTML for images if provided
-        let imagesHTML = "";
-        if (data.images && Array.isArray(data.images) && data.images.length) {
-          data.images.forEach((base64Img) => {
-            imagesHTML += `
-              <br>
-              <img
-                src="data:image/png;base64,${base64Img}"
-                alt="Response Image"
-                style="max-width: 300px; display: block; margin-top: 10px;"
-              >
-            `;
-          });
-        }
-        const finalHTML = answerHTML + imagesHTML;
+        // 3) wrap each in your green underlined label
+        const block1 = `
+          <div class="response-label">Response 1</div>
+          ${html1}
+          ${ data.images[0]
+            ? `<div style="margin-top:10px">
+                <a href="#" class="img-link" data-img="${data.images[0]}">
+                  <img src="data:image/png;base64,${data.images[0]}"
+                        style="max-width:300px;display:block;cursor:pointer">
+                </a>
+              </div>`
+            : "" }
+        `;
+        const block2 = `
+          <div class="response-label" style="margin-top:20px">Response 2</div>
+          ${html2}
+          ${ data.images[1]
+            ? `<div style="margin-top:10px">
+                <a href="#" class="img-link" data-img="${data.images[1]}">
+                  <img src="data:image/png;base64,${data.images[1]}"
+                        style="max-width:300px;display:block;cursor:pointer">
+                </a>
+              </div>`
+            : "" }
+        `;
 
-        // Append bot (left) message using the new BOT_IMG
-        appendMessage(BOT_NAME, BOT_IMG, "left", finalHTML);
+        // 4) merge into one bubble with a divider
+        const combined = `
+          ${block1}
+          <hr style="border:1px solid rgba(255,255,255,0.2);margin:20px 0;">
+          ${block2}
+        `;
+        appendMessage(BOT_NAME, BOT_IMG, "left", combined);
       });
     }
 
-    // Utility to format timestamps in message bubbles
-    function formatDate(date) {
-      const h = "0" + date.getHours();
-      const m = "0" + date.getMinutes();
-      return `${h.slice(-2)}:${m.slice(-2)}`;
-    }
+    document.body.addEventListener('click', function(e) {
+    const a = e.target.closest('a.img-link');
+    if (!a) return;
+    e.preventDefault();
+
+    const b64 = a.dataset.img;
+    const img = new Image();
+    img.src = 'data:image/png;base64,' + b64;
+    img.onload = () => {
+      // down-scale to max width of 800px (adjust as you like)
+      const maxW = 1000;
+      const scale = Math.min(1, maxW / img.width);
+      const cw = img.width * scale;
+      const ch = img.height * scale;
+
+      const c = document.createElement('canvas');
+      c.width  = cw;
+      c.height = ch;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, cw, ch);
+
+      // you can also pass a quality param to toDataURL if you like:
+      const smallDataURL = c.toDataURL('image/png', 0.8);
+
+      // open the down-scaled image in a new tab
+      const w = window.open();
+      w.document.write(`<img src="${smallDataURL}" style="max-width:100%;">`);
+      w.document.title = "GeoDataX – Enlarged Image";
+    };
+  });    
+
   </script>
 </body>
 </html>
